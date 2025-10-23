@@ -1,0 +1,212 @@
+[
+  {
+    "hub_destination": "Neang",
+    "address_destination": "Banteay Neang, Mongkol Borei, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 1,
+    "destination_lat": 13.511247208084235,
+    "destination_long": 103.01560144327931,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Chamnaom",
+    "address_destination": "Chamnaom, Mongkol Borei, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 5,
+    "destination_lat": 13.443615778282744,
+    "destination_long": 102.93668775627575,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Chob Vari",
+    "address_destination": "Chob Vari, Preah Netr Preah, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 2,
+    "destination_lat": 13.625020859169465,
+    "destination_long": 103.18357308000657,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Kampong",
+    "address_destination": "Kampong Svay, Serei Saophoan, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 9,
+    "destination_lat": 13.60333631269662,
+    "destination_long": 102.96638004012016,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Romiet",
+    "address_destination": "Kouk Romiet, Thma Puok, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 1,
+    "destination_lat": 13.999729389145335,
+    "destination_long": 102.94748238563486,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Kumru",
+    "address_destination": "Kumru, Thma Puok, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 1,
+    "destination_lat": 13.966647629377748,
+    "destination_long": 103.01650529778468,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Kuttasat",
+    "address_destination": "Kuttasat, Ou Chrov, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 3,
+    "destination_lat": 13.58706226804031,
+    "destination_long": 102.7623886469643,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Nimits",
+    "address_destination": "Nimitt, Paoy Paet, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 3,
+    "destination_lat": 13.628337051394524,
+    "destination_long": 102.67809194104306,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Ou Ambel",
+    "address_destination": "Ou Ambel, Serei Saophoan, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 4,
+    "destination_lat": 13.589306193165568,
+    "destination_long": 102.96826415498447,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Ou Beichoan",
+    "address_destination": "Ou Beichoan, Ou Chrov, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 2,
+    "destination_lat": 13.77324997697082,
+    "destination_long": 102.73589676770048,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Ou Prasat",
+    "address_destination": "Ou Prasat, Mongkol Borei, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 4,
+    "destination_lat": 13.451331915159788,
+    "destination_long": 103.01572630095417,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Paoy Paet",
+    "address_destination": "Paoy Paet, Paoy Paet, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 125,
+    "destination_lat": 13.656137064251181,
+    "destination_long": 102.56109547233525,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Phkoam",
+    "address_destination": "Phkoam, Svay Chek, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 1,
+    "destination_lat": 13.830943295917885,
+    "destination_long": 103.12695576613942,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Phnum",
+    "address_destination": "Phnum Touch, Mongkol Borei, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 7,
+    "destination_lat": 13.406475549756191,
+    "destination_long": 103.01825200471625,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Phsar",
+    "address_destination": "Phsar Kandal, Paoy Paet, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 12,
+    "destination_lat": 13.638428781920434,
+    "destination_long": 102.58906246923077,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Preah Ponlea",
+    "address_destination": "Preah Ponlea, Serei Saophoan, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 10,
+    "destination_lat": 13.584320684580035,
+    "destination_long": 102.980814580327,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Ruesei",
+    "address_destination": "Ruessei Kraok, Mongkol Borei, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 3,
+    "destination_lat": 13.539547188603178,
+    "destination_long": 103.0219104415312,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Soea",
+    "address_destination": "Soea, Mongkol Borei, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 1,
+    "destination_lat": 13.393223329289558,
+    "destination_long": 102.92809579647667,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Ta Baen",
+    "address_destination": "Ta Baen, Svay Chek, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 2,
+    "destination_lat": 13.77235475937592,
+    "destination_long": 102.96133026160418,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Thma",
+    "address_destination": "Thma Puok, Thma Puok, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 1,
+    "destination_lat": 13.940397833521008,
+    "destination_long": 103.04980510191888,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  },
+  {
+    "hub_destination": "Tuek Thla",
+    "address_destination": "Tuek Thla, Serei Saophoan, Banteay Meanchey",
+    "hub_departer": "Hub Poipet",
+    "order": 3,
+    "destination_lat": 13.587161179885648,
+    "destination_long": 102.93708315433133,
+    "departer_lat": 13.62807293099851,
+    "departer_long": 102.6770495395148
+  }
+]
