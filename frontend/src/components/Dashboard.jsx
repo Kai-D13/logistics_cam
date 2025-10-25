@@ -108,6 +108,25 @@ const Dashboard = ({
     setCalculatedRoutes([]);
   };
 
+  const handleResetAll = () => {
+    // Reset hub selection
+    onHubChange(null);
+    // Reset destinations
+    onDestinationsChange([]);
+    // Reset filters
+    onProvinceFilterChange('');
+    onDistrictFilterChange('');
+    onWardFilterChange('');
+    // Reset cross-hub mode
+    setShowAllDestinations(false);
+    // Reset search
+    setHubSearchQuery('');
+    // Reset routes
+    setCalculatedRoutes([]);
+    // Dispatch event to reset map view
+    window.dispatchEvent(new CustomEvent('reset-map'));
+  };
+
   const handleCalculate = async () => {
     if (selectedDestinations.length === 0) {
       alert('Vui lòng chọn ít nhất 1 điểm đến');
@@ -136,11 +155,36 @@ const Dashboard = ({
       <div style={{
         padding: '20px',
         backgroundColor: '#fff',
-        borderBottom: '2px solid #e9ecef'
+        borderBottom: '2px solid #e9ecef',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
       }}>
         <h2 style={{ margin: 0, fontSize: '20px', color: '#333' }}>
           📊 Dashboard
         </h2>
+        <button
+          onClick={handleResetAll}
+          title="Reset tất cả về trạng thái ban đầu"
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#dc3545',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: '500',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
+        >
+          🔄 Reset
+        </button>
       </div>
 
       {/* Tabs */}

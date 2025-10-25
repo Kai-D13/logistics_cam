@@ -17,7 +17,10 @@ const Map = ({
   const map = useRef(null);
   const hubMarkersRef = useRef([]);
   const routeLayersRef = useRef([]);
+  const routeDestMarkersRef = useRef([]); // Markers for route destinations
   const hubTerritoryLayerRef = useRef(null);
+  const initialCenter = [104.9, 12.5]; // Center of Cambodia
+  const initialZoom = 6.5;
 
   // Initialize map
   useEffect(() => {
@@ -26,8 +29,8 @@ const Map = ({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: [104.9, 12.5], // Center of Cambodia
-      zoom: 6.5
+      center: initialCenter,
+      zoom: initialZoom
     });
 
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
@@ -117,11 +120,11 @@ const Map = ({
             'interpolate',
             ['linear'],
             ['get', 'oders_per_month'],
-            0, 5,      // 0 orders = 5px radius
-            10, 8,     // 10 orders = 8px
-            20, 11,    // 20 orders = 11px
-            50, 15,    // 50 orders = 15px
-            100, 20    // 100+ orders = 20px
+            0, 8,      // 0 orders = 8px radius (increased from 5px)
+            10, 12,    // 10 orders = 12px (increased from 8px)
+            20, 16,    // 20 orders = 16px (increased from 11px)
+            50, 22,    // 50 orders = 22px (increased from 15px)
+            100, 28    // 100+ orders = 28px (increased from 20px)
           ],
           'circle-stroke-width': 2,
           'circle-stroke-color': '#fff',
@@ -440,6 +443,10 @@ const Map = ({
     });
     routeLayersRef.current = [];
 
+    // Remove old route destination markers
+    routeDestMarkersRef.current.forEach(marker => marker.remove());
+    routeDestMarkersRef.current = [];
+
     // If no routes to show, return
     if (!showRoutes || !calculatedRoutes || calculatedRoutes.length === 0) {
       return;
@@ -476,8 +483,75 @@ const Map = ({
       });
 
       routeLayersRef.current.push(layerId);
+
+      // Add destination marker with number label
+      const dest = destinations.find(d => d.id === route.destId);
+      if (dest && dest.lat && dest.long) {
+        const el = document.createElement('div');
+        el.style.cssText = `
+          background-color: ${color};
+          color: white;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 3px solid white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 14px;
+          cursor: pointer;
+          box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+          transition: all 0.2s;
+        `;
+        el.textContent = index + 1;
+
+        // Add hover effect
+        el.addEventListener('mouseenter', () => {
+          el.style.transform = 'scale(1.2)';
+          el.style.zIndex = '1000';
+        });
+        el.addEventListener('mouseleave', () => {
+          el.style.transform = 'scale(1)';
+          el.style.zIndex = '1';
+        });
+
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([dest.long, dest.lat])
+          .setPopup(
+            new mapboxgl.Popup({ offset: 25 })
+              .setHTML(`
+                <div style="padding: 8px; min-width: 180px;">
+                  <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #333;">
+                    📍 Điểm ${index + 1}: ${dest.name}
+                  </h4>
+                  <div style="font-size: 11px; color: #666; margin-bottom: 3px;">
+                    🏠 ${dest.address || 'N/A'}
+                  </div>
+                  <div style="font-size: 11px; color: #666; margin-bottom: 3px;">
+                    🏢 ${dest.carrier_type} • 📦 ${dest.oders_per_month || 0} orders/tháng
+                  </div>
+                  <div style="
+                    font-size: 12px;
+                    color: white;
+                    background-color: ${color};
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    margin-top: 6px;
+                    font-weight: bold;
+                    text-align: center;
+                  ">
+                    📏 ${route.distance.toFixed(2)} km • ⏱️ ${Math.round(route.duration)} phút
+                  </div>
+                </div>
+              `)
+          )
+          .addTo(map.current);
+
+        routeDestMarkersRef.current.push(marker);
+      }
     });
-  }, [calculatedRoutes, showRoutes]);
+  }, [calculatedRoutes, showRoutes, destinations]);
 
   // Handle hub territory visualization
   useEffect(() => {
@@ -515,23 +589,19 @@ const Map = ({
         bounds.extend([dest.long, dest.lat]);
       });
 
-      // Zoom to bounds with padding
-      map.current.fitBounds(bounds, {
-        padding: { top: 100, bottom: 100, left: 100, right: 100 },
-        maxZoom: 12,
-        duration: 1500
-      });
+      // Dispatch event to select this hub (so destinations will be displayed)
+      window.dispatchEvent(new CustomEvent('select-hub-from-map', {
+        detail: { hubId: hub.id }
+      }));
 
-      // Highlight hub destinations temporarily
+      // Zoom to bounds with padding (after a small delay to let destinations load)
       setTimeout(() => {
-        // Flash effect - update destination markers
-        const destSource = map.current.getSource('destinations');
-        if (destSource) {
-          const currentData = destSource._data;
-          // Trigger re-render by updating source
-          destSource.setData(currentData);
-        }
-      }, 1600);
+        map.current.fitBounds(bounds, {
+          padding: { top: 100, bottom: 100, left: 100, right: 100 },
+          maxZoom: 12,
+          duration: 1500
+        });
+      }, 100);
     };
 
     window.addEventListener('hub-click', handleHubClick);
@@ -540,6 +610,32 @@ const Map = ({
       window.removeEventListener('hub-click', handleHubClick);
     };
   }, [hubs, destinations]);
+
+  // Handle reset map event
+  useEffect(() => {
+    const handleResetMap = () => {
+      if (!map.current) return;
+
+      // Fly back to initial view
+      map.current.flyTo({
+        center: initialCenter,
+        zoom: initialZoom,
+        duration: 1500
+      });
+
+      // Close all popups
+      const popups = document.getElementsByClassName('mapboxgl-popup');
+      if (popups.length) {
+        Array.from(popups).forEach(popup => popup.remove());
+      }
+    };
+
+    window.addEventListener('reset-map', handleResetMap);
+
+    return () => {
+      window.removeEventListener('reset-map', handleResetMap);
+    };
+  }, []);
 
   return (
     <div

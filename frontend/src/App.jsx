@@ -45,6 +45,29 @@ function App() {
       });
   }, []);
 
+  // Handle hub selection from map (when clicking "Xem khu vực phủ sóng")
+  useEffect(() => {
+    const handleSelectHubFromMap = (event) => {
+      const { hubId } = event.detail;
+      const hub = hubs.find(h => h.id === hubId);
+      if (hub) {
+        setSelectedHub(hub);
+        setSelectedDestinations([]);
+        setCalculatedRoutes([]);
+        // Reset filters
+        setProvinceFilter('');
+        setDistrictFilter('');
+        setWardFilter('');
+      }
+    };
+
+    window.addEventListener('select-hub-from-map', handleSelectHubFromMap);
+
+    return () => {
+      window.removeEventListener('select-hub-from-map', handleSelectHubFromMap);
+    };
+  }, [hubs]);
+
   // Get destinations for selected hub
   const getHubDestinations = () => {
     if (!selectedHub) return [];
