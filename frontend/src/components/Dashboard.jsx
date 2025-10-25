@@ -291,6 +291,19 @@ const Dashboard = ({
                   }
                   const hub = hubs.find(h => h.id === hubId);
                   if (hub) {
+                    // Check if hub has destinations
+                    const hubDests = destinations.filter(d => d.hub_id === hub.id);
+                    if (hubDests.length === 0) {
+                      const confirmSelect = window.confirm(
+                        `⚠️ Hub "${hub.name}" chưa có destinations nào.\n\n` +
+                        `Bạn vẫn muốn chọn hub này không?\n\n` +
+                        `(Bạn sẽ không thể tính khoảng cách cho hub này)`
+                      );
+                      if (!confirmSelect) {
+                        return; // Don't select this hub
+                      }
+                    }
+
                     onHubChange(hub);
                     setHubSearchQuery(''); // Clear search after selection
                     // Reset filters when changing hub
@@ -314,11 +327,15 @@ const Dashboard = ({
                     ? `${filteredHubs.length} hub tìm thấy`
                     : `-- Chọn hub (${hubs.length} hubs) --`}
                 </option>
-                {filteredHubs.map(hub => (
-                  <option key={hub.id} value={hub.id}>
-                    {hub.name} - {hub.province_name}
-                  </option>
-                ))}
+                {filteredHubs.map(hub => {
+                  const hubDestCount = destinations.filter(d => d.hub_id === hub.id).length;
+                  const isEmpty = hubDestCount === 0;
+                  return (
+                    <option key={hub.id} value={hub.id}>
+                      {hub.name} - {hub.province_name} {isEmpty ? '⚠️ (Chưa có destinations)' : `(${hubDestCount} dests)`}
+                    </option>
+                  );
+                })}
               </select>
 
               {/* Search hint */}
@@ -346,6 +363,26 @@ const Dashboard = ({
                   border: '1px solid #f5c6cb'
                 }}>
                   ✕ Không tìm thấy hub nào. Thử từ khóa khác.
+                </div>
+              )}
+
+              {/* Warning for empty hub */}
+              {selectedHub && availableDestinations.length === 0 && !showAllDestinations && (
+                <div style={{
+                  marginTop: '10px',
+                  padding: '10px',
+                  backgroundColor: '#fff3cd',
+                  border: '1px solid #ffc107',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  color: '#856404'
+                }}>
+                  <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                    ⚠️ Hub này chưa có destinations
+                  </div>
+                  <div style={{ fontSize: '11px' }}>
+                    Vui lòng chọn hub khác hoặc thêm destinations vào file destinations.json
+                  </div>
                 </div>
               )}
 

@@ -251,6 +251,7 @@ const Map = ({
       const totalOrders = hubDestinations.reduce((sum, d) => sum + (d.oders_per_month || 0), 0);
       const twoPlCount = hubDestinations.filter(d => d.carrier_type === '2PL').length;
       const threePlCount = hubDestinations.filter(d => d.carrier_type === '3PL').length;
+      const isEmpty = hubDestinations.length === 0;
 
       // Calculate marker size based on total orders
       // Base size: 18px, scale up to 36px for high-volume hubs
@@ -262,15 +263,24 @@ const Map = ({
 
       const markerSize = isSelected ? baseSize + 4 : baseSize;
 
+      // Different color for empty hubs
+      let backgroundColor;
+      if (isEmpty) {
+        backgroundColor = isSelected ? '#999999' : '#CCCCCC'; // Gray for empty hubs
+      } else {
+        backgroundColor = isSelected ? '#FF0000' : '#FF6B6B'; // Red for normal hubs
+      }
+
       el.style.cssText = `
-        background-color: ${isSelected ? '#FF0000' : '#FF6B6B'};
+        background-color: ${backgroundColor};
         width: ${markerSize}px;
         height: ${markerSize}px;
         border-radius: 50%;
-        border: 3px solid white;
+        border: 3px solid ${isEmpty ? '#666' : 'white'};
         cursor: pointer;
         box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         transition: all 0.3s ease;
+        ${isEmpty ? 'opacity: 0.6;' : ''}
       `;
 
       const marker = new mapboxgl.Marker(el)
@@ -324,23 +334,31 @@ const Map = ({
                   </div>
                 </div>
 
-                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #eee; text-align: center;">
-                  <button
-                    onclick="window.dispatchEvent(new CustomEvent('hub-click', { detail: { hubId: '${hub.id}' } }))"
-                    style="
-                      background: #4264fb;
-                      color: white;
-                      border: none;
-                      padding: 6px 12px;
-                      border-radius: 4px;
-                      font-size: 11px;
-                      cursor: pointer;
-                      font-weight: 500;
-                    "
-                  >
-                    🔍 Xem khu vực phủ sóng
-                  </button>
-                </div>
+                ${isEmpty ? `
+                  <div style="margin-top: 10px; padding: 8px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;">
+                    <div style="font-size: 11px; color: #856404; text-align: center;">
+                      ⚠️ Hub này chưa có destinations
+                    </div>
+                  </div>
+                ` : `
+                  <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #eee; text-align: center;">
+                    <button
+                      onclick="window.dispatchEvent(new CustomEvent('hub-click', { detail: { hubId: '${hub.id}' } }))"
+                      style="
+                        background: #4264fb;
+                        color: white;
+                        border: none;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        font-size: 11px;
+                        cursor: pointer;
+                        font-weight: 500;
+                      "
+                    >
+                      🔍 Xem khu vực phủ sóng
+                    </button>
+                  </div>
+                `}
               </div>
             `)
         )
@@ -414,21 +432,36 @@ const Map = ({
 
     // Fit bounds to show all destinations
     if (features.length > 0 && selectedHub) {
-      const bounds = new mapboxgl.LngLatBounds();
-      
-      // Add hub to bounds
-      bounds.extend([selectedHub.long, selectedHub.lat]);
-      
-      // Add destinations to bounds
-      features.forEach(feature => {
-        bounds.extend(feature.geometry.coordinates);
-      });
+      try {
+        const bounds = new mapboxgl.LngLatBounds();
 
-      map.current.fitBounds(bounds, {
-        padding: { top: 100, bottom: 100, left: 450, right: 100 },
-        maxZoom: 12,
-        duration: 1000
-      });
+        // Add hub to bounds (validate coordinates)
+        if (selectedHub.long && selectedHub.lat &&
+            !isNaN(selectedHub.long) && !isNaN(selectedHub.lat)) {
+          bounds.extend([selectedHub.long, selectedHub.lat]);
+        }
+
+        // Add destinations to bounds (validate coordinates)
+        features.forEach(feature => {
+          if (feature.geometry && feature.geometry.coordinates) {
+            const [lng, lat] = feature.geometry.coordinates;
+            if (!isNaN(lng) && !isNaN(lat)) {
+              bounds.extend(feature.geometry.coordinates);
+            }
+          }
+        });
+
+        // Only fit bounds if we have valid bounds
+        if (!bounds.isEmpty()) {
+          map.current.fitBounds(bounds, {
+            padding: { top: 100, bottom: 100, left: 450, right: 100 },
+            maxZoom: 12,
+            duration: 1000
+          });
+        }
+      } catch (error) {
+        console.warn('Error fitting bounds:', error);
+      }
     }
   }, [destinations, selectedHub, selectedDestinations]);
 
@@ -582,26 +615,40 @@ const Map = ({
       }
 
       // Calculate bounds to fit all destinations + hub
-      const bounds = new mapboxgl.LngLatBounds();
-      bounds.extend([hub.long, hub.lat]); // Add hub
+      try {
+        const bounds = new mapboxgl.LngLatBounds();
 
-      validDests.forEach(dest => {
-        bounds.extend([dest.long, dest.lat]);
-      });
+        // Add hub to bounds (validate coordinates)
+        if (hub.long && hub.lat && !isNaN(hub.long) && !isNaN(hub.lat)) {
+          bounds.extend([hub.long, hub.lat]);
+        }
 
-      // Dispatch event to select this hub (so destinations will be displayed)
-      window.dispatchEvent(new CustomEvent('select-hub-from-map', {
-        detail: { hubId: hub.id }
-      }));
-
-      // Zoom to bounds with padding (after a small delay to let destinations load)
-      setTimeout(() => {
-        map.current.fitBounds(bounds, {
-          padding: { top: 100, bottom: 100, left: 100, right: 100 },
-          maxZoom: 12,
-          duration: 1500
+        // Add valid destinations to bounds
+        validDests.forEach(dest => {
+          if (dest.long && dest.lat && !isNaN(dest.long) && !isNaN(dest.lat)) {
+            bounds.extend([dest.long, dest.lat]);
+          }
         });
-      }, 100);
+
+        // Dispatch event to select this hub (so destinations will be displayed)
+        window.dispatchEvent(new CustomEvent('select-hub-from-map', {
+          detail: { hubId: hub.id }
+        }));
+
+        // Zoom to bounds with padding (after a small delay to let destinations load)
+        if (!bounds.isEmpty()) {
+          setTimeout(() => {
+            map.current.fitBounds(bounds, {
+              padding: { top: 100, bottom: 100, left: 100, right: 100 },
+              maxZoom: 12,
+              duration: 1500
+            });
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Error showing hub territory:', error);
+        alert(`Lỗi khi hiển thị khu vực hub "${hub.name}". Vui lòng thử lại.`);
+      }
     };
 
     window.addEventListener('hub-click', handleHubClick);
