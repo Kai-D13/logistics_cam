@@ -253,6 +253,14 @@ const Map = ({
       const threePlCount = hubDestinations.filter(d => d.carrier_type === '3PL').length;
       const isEmpty = hubDestinations.length === 0;
 
+      // Calculate orders by carrier type
+      const twoPlOrders = hubDestinations
+        .filter(d => d.carrier_type === '2PL')
+        .reduce((sum, d) => sum + (d.oders_per_month || 0), 0);
+      const threePlOrders = hubDestinations
+        .filter(d => d.carrier_type === '3PL')
+        .reduce((sum, d) => sum + (d.oders_per_month || 0), 0);
+
       // Calculate marker size based on total orders
       // Base size: 18px, scale up to 36px for high-volume hubs
       let baseSize = 18;
@@ -333,6 +341,32 @@ const Map = ({
                     </div>
                   </div>
                 </div>
+
+                ${!isEmpty ? `
+                  <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
+                    <div style="font-size: 11px; color: #666; font-weight: bold; margin-bottom: 6px;">
+                      📊 Order Breakdown by Carrier Type
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                      <div style="font-size: 11px; color: #333;">
+                        <span style="display: inline-block; width: 8px; height: 8px; background: #28a745; border-radius: 50%; margin-right: 4px;"></span>
+                        2PL Orders:
+                      </div>
+                      <div style="font-size: 11px; font-weight: bold; color: #28a745;">
+                        ${twoPlOrders.toLocaleString()}
+                      </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                      <div style="font-size: 11px; color: #333;">
+                        <span style="display: inline-block; width: 8px; height: 8px; background: #007bff; border-radius: 50%; margin-right: 4px;"></span>
+                        3PL Orders:
+                      </div>
+                      <div style="font-size: 11px; font-weight: bold; color: #007bff;">
+                        ${threePlOrders.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
 
                 ${isEmpty ? `
                   <div style="margin-top: 10px; padding: 8px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;">

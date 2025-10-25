@@ -3,106 +3,106 @@
     "id": "hub_battambang",
     "name": "Hub Battambang",
     "province_name": "Battambang",
-    "lat": 13.096657610599568,
-    "long": 103.20217383622888
+    "lat": 13.09787484337462,
+    "long": 103.19671276757751
   },
   {
     "id": "hub_kampong_cham",
     "name": "Hub Kampong Cham",
     "province_name": "Kampong Cham",
-    "lat": 12.086462506236796,
-    "long": 105.25395216672084
+    "lat": 12.078861163344751,
+    "long": 105.1887396469285
   },
   {
     "id": "hub_kampong_thom",
     "name": "Hub Kampong Thom",
     "province_name": "Kampong Thom",
-    "lat": 12.766917697821768,
-    "long": 105.06679567715682
+    "lat": 12.953057481702254,
+    "long": 104.9441634968123
   },
   {
     "id": "hub_kandal",
     "name": "Hub Kandal",
     "province_name": "Kandal",
-    "lat": 11.22574545580352,
-    "long": 105.12515906804843
+    "lat": 11.465109211481591,
+    "long": 104.9535828570268
   },
   {
     "id": "hub_phnom_penh",
     "name": "Hub Phnom Penh",
     "province_name": "Phnom Penh",
-    "lat": 11.55701483432372,
-    "long": 104.92130259427991
+    "lat": 11.524029653085046,
+    "long": 104.77824374698798
   },
   {
     "id": "hub_siem_reap",
     "name": "Hub Siemreap",
     "province_name": "Siemreap",
-    "lat": 13.356004915381064,
-    "long": 103.85789585950043
+    "lat": 13.354447940084878,
+    "long": 103.85854345731389
   },
   {
     "id": "hub_tboung_khmum",
     "name": "Hub Tboung Khmum",
     "province_name": "Tboung Khmum",
-    "lat": 11.888751212369565,
-    "long": 105.8797924926657
+    "lat": 11.79272691347778,
+    "long": 105.49960018162396
   },
   {
-    "id": "hub_banteay_meanchay",
+    "id": "hub_banteay_meanchey",
     "name": "Hub Banteay Meanchey",
     "province_name": "Banteay Meanchey",
-    "lat": 13.755785096777876,
-    "long": 102.95386428970382
+    "lat": 13.660283613481216,
+    "long": 102.5686914062155
   },
   {
     "id": "hub_kampong_speu",
     "name": "Hub Kampong Speu",
     "province_name": "Kampong Speu",
-    "lat": 11.465674238587713,
-    "long": 104.50643241492216
+    "lat": 11.382456808720526,
+    "long": 104.37230589517895
   },
   {
-    "id": "hub_kampong_chnang",
+    "id": "hub_kampong_chhnang",
     "name": "Hub Kampong Chhnang",
     "province_name": "Kampong Chhnang",
-    "lat": 12.26317752260197,
-    "long": 104.67384995337297
+    "lat": 11.879014123985318,
+    "long": 104.60922018107387
   },
   {
     "id": "hub_kampot",
     "name": "Hub Kampot",
     "province_name": "Kampot",
-    "lat": 10.605643419592246,
-    "long": 104.17004232673293
+    "lat": 10.606948318889799,
+    "long": 104.17240486834534
   },
   {
     "id": "hub_koh_kong",
     "name": "Hub Koh Kong",
     "province_name": "Koh Kong",
-    "lat": 11.580501381023417,
-    "long": 103.36779410950088
+    "lat": 11.59469426480922,
+    "long": 103.0026879152422
   },
   {
     "id": "hub_kratie",
     "name": "Hub Kratie",
     "province_name": "Kratie",
-    "lat": 12.494844851313747,
-    "long": 106.01966439834837
+    "lat": 12.069617399376806,
+    "long": 106.42372971308174
   },
   {
     "id": "hub_mondul_kiri",
     "name": "Hub Mondul Kiri",
     "province_name": "Mondul Kiri",
-    "lat": 12.788549154451367,
-    "long": 107.06982058757404
+    "lat": 13.074446176570628,
+    "long": 107.04054043805311
   },
   {
-    "id": "hub_oddar_meanchay",
+    "id": "hub_oddar_meanchey",
     "name": "Hub Oddar Meanchey",
     "province_name": "Oddar Meanchey",
-    "lat": 14.1707167573051825,
-    "long": 103.8154193978077
+    "lat": 14.20700300521265,
+    "long": 103.5545298862923
   },
   {
     "id": "hub_pailin",
@@ -116,35 +116,35 @@
     "name": "Hub Preah Sihanouk",
     "province_name": "Preah Sihanouk",
     "lat": 10.586425930431236,
-    "long": 103.6488736225399
+    "long": 103.64887362251399
   },
   {
     "id": "hub_preah_vihear",
     "name": "Hub Preah Vihear",
     "province_name": "Preah Vihear",
-    "lat": 14.014305667050614,
-    "long": 104.8157604121532
+    "lat": 14.217178206556245,
+    "long": 104.93841954694729
   },
   {
     "id": "hub_prey_veng",
     "name": "Hub Prey Veng",
     "province_name": "Prey Veng",
-    "lat": 11.382319088895652,
-    "long": 105.47567474747531
+    "lat": 11.091091602411609,
+    "long": 105.38498434257367
   },
   {
     "id": "hub_pursat",
     "name": "Hub Pursat",
     "province_name": "Pursat",
     "lat": 12.468617192974369,
-    "long": 103.88921594944975
+    "long": 103.88921594444975
   },
   {
     "id": "hub_ratanak_kiri",
     "name": "Hub Ratanak Kiri",
     "province_name": "Ratanak Kiri",
-    "lat": 13.86067024923995,
-    "long": 107.0777905948167
+    "lat": 13.73792162943159,
+    "long": 106.98628544735867
   },
   {
     "id": "hub_stung_treng",
@@ -157,14 +157,14 @@
     "id": "hub_svay_rieng",
     "name": "Hub Svay Rieng",
     "province_name": "Svay Rieng",
-    "lat": 11.089124213437628,
-    "long": 105.80160073771678
+    "lat": 11.046852019736928,
+    "long": 106.06329471671492
   },
   {
     "id": "hub_takeo",
     "name": "Hub Takeo",
     "province_name": "Takeo",
-    "lat": 10.935949821901339,
-    "long": 104.78583824036732
+    "lat": 11.248578800565118,
+    "long": 104.81770605466772
   }
 ]
