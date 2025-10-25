@@ -1,0 +1,11 @@
+{
+  "name": "logistics-map-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Utility scripts for logistics map",
+  "scripts": {
+    "geocode": "node geocode-mapbox.js"
+  },
+  "dependencies": {}
+}
+

@@ -1,221 +1,554 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { createCircleBoundary, getColorForCommune, parseAddress, calculateArea } from '../utils/boundaries';
 
-// Use environment variable for Mapbox token
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1Ijoia2FpZHJvZ2VyIiwiYSI6ImNtaDM4bnB2cjBuN28ybnM5NmV0ZTluZHEifQ.YHW9Erg1h5egssNhthQiZw';
 
-const Map = ({ markers, onMarkerClick, showBoundaries = true, showRoutes = true, focusMode = false, focusedDestinations = [] }) => {
+const Map = ({
+  hubs,
+  destinations,
+  selectedHub,
+  selectedDestinations,
+  showBoundaries,
+  showRoutes,
+  calculatedRoutes
+}) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(102.8);
-  const [lat, setLat] = useState(13.6);
-  const [zoom, setZoom] = useState(9);
-  const markersRef = useRef([]);
-  const routeLayers = useRef([]);
-  const boundaryLayers = useRef([]);
+  const hubMarkersRef = useRef([]);
+  const routeLayersRef = useRef([]);
+  const hubTerritoryLayerRef = useRef(null);
 
+  // Initialize map
   useEffect(() => {
     if (map.current) return;
+
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: [lng, lat],
-      zoom: zoom
+      center: [104.9, 12.5], // Center of Cambodia
+      zoom: 6.5
     });
+
     map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
     map.current.addControl(new mapboxgl.ScaleControl({ maxWidth: 100, unit: 'metric' }), 'bottom-left');
-    map.current.on('move', () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
-      setZoom(map.current.getZoom().toFixed(2));
-    });
-  }, []);
 
-  const fetchRoute = async (start, end) => {
-    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.routes && data.routes.length > 0) {
-        return {
-          geometry: data.routes[0].geometry,
-          distance: data.routes[0].distance / 1000,
-          duration: data.routes[0].duration / 60
-        };
-      }
-    } catch (error) {
-      console.error('Error fetching route:', error);
-    }
-    return null;
-  };
+    // Wait for map to load before adding sources
+    map.current.on('load', () => {
+      // Add destinations source with clustering
+      map.current.addSource('destinations', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        },
+        cluster: true,
+        clusterMaxZoom: 14,
+        clusterRadius: 50
+      });
 
-  useEffect(() => {
-    if (!map.current || !markers || markers.length === 0) return;
-
-    const addMarkersAndRoutes = async () => {
-      // Remove markers
-      markersRef.current.forEach(marker => marker.remove());
-      markersRef.current = [];
-
-      // Remove route layers and sources
-      routeLayers.current.forEach(layerId => {
-        try {
-          if (map.current.getLayer(layerId)) map.current.removeLayer(layerId);
-          if (map.current.getSource(layerId)) map.current.removeSource(layerId);
-        } catch (e) {
-          console.error('Error removing route layer:', e);
+      // Cluster circles
+      map.current.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'destinations',
+        filter: ['has', 'point_count'],
+        paint: {
+          'circle-color': [
+            'step',
+            ['get', 'point_count'],
+            '#51bbd6',
+            10,
+            '#f1f075',
+            30,
+            '#f28cb1'
+          ],
+          'circle-radius': [
+            'step',
+            ['get', 'point_count'],
+            20,
+            10,
+            30,
+            30,
+            40
+          ]
         }
       });
-      routeLayers.current = [];
 
-      // Remove boundary layers BEFORE removing sources
-      boundaryLayers.current.forEach(layerId => {
-        try {
-          const fillId = `boundary-fill-${layerId.split('-')[1]}`;
-          const outlineId = `boundary-outline-${layerId.split('-')[1]}`;
-          if (map.current.getLayer(fillId)) map.current.removeLayer(fillId);
-          if (map.current.getLayer(outlineId)) map.current.removeLayer(outlineId);
-          if (map.current.getSource(layerId)) map.current.removeSource(layerId);
-        } catch (e) {
-          console.error('Error removing boundary layer:', e);
+      // Cluster count
+      map.current.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'destinations',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+          'text-size': 12
         }
       });
-      boundaryLayers.current = [];
 
-      // Determine which markers to display
-      const displayMarkers = focusMode && focusedDestinations.length > 0
-        ? focusedDestinations
-        : markers;
+      // Unclustered points with carrier type colors
+      map.current.addLayer({
+        id: 'unclustered-point',
+        type: 'circle',
+        source: 'destinations',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+          'circle-color': [
+            'case',
+            ['boolean', ['get', 'selected'], false],
+            // Selected: brighter version of carrier color
+            [
+              'case',
+              ['==', ['get', 'carrier_type'], '2PL'],
+              '#4264fb', // 2PL blue
+              '#ff8c00'  // 3PL orange
+            ],
+            // Not selected: carrier type color
+            [
+              'case',
+              ['==', ['get', 'carrier_type'], '2PL'],
+              '#4264fb', // 2PL blue
+              '#ff8c00'  // 3PL orange
+            ]
+          ],
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['get', 'oders_per_month'],
+            0, 5,      // 0 orders = 5px radius
+            10, 8,     // 10 orders = 8px
+            20, 11,    // 20 orders = 11px
+            50, 15,    // 50 orders = 15px
+            100, 20    // 100+ orders = 20px
+          ],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#fff',
+          'circle-opacity': [
+            'case',
+            ['boolean', ['get', 'selected'], false],
+            1,
+            0.8
+          ]
+        }
+      });
 
-      const hubDeparter = markers[0];
-      const departerCoords = [hubDeparter.departer_long, hubDeparter.departer_lat];
+      // Click on cluster to zoom
+      map.current.on('click', 'clusters', (e) => {
+        const features = map.current.queryRenderedFeatures(e.point, {
+          layers: ['clusters']
+        });
+        const clusterId = features[0].properties.cluster_id;
+        map.current.getSource('destinations').getClusterExpansionZoom(
+          clusterId,
+          (err, zoom) => {
+            if (err) return;
 
-      // Calculate total orders from displayed markers
-      const totalOrdersFromHub = displayMarkers.reduce((sum, m) => sum + m.order, 0);
-
-      const departerEl = document.createElement('div');
-      departerEl.style.cssText = 'background-color:#FF0000;width:30px;height:30px;border-radius:50%;border:3px solid white;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.3)';
-
-      const hubPopupHTML = `
-        <div style="padding:12px;min-width:250px">
-          <h3 style="margin:0 0 10px 0;color:#FF0000;font-weight:bold;font-size:16px">${hubDeparter.hub_departer}</h3>
-          <p style="margin:5px 0;font-size:13px"><strong>📍 Địa chỉ:</strong> Poipet, Banteay Meanchey, Cambodia</p>
-          <p style="margin:5px 0;font-size:13px"><strong>📦 Tổng đơn hàng/tháng:</strong> ${totalOrdersFromHub} đơn</p>
-          <p style="margin:5px 0;font-size:13px"><strong>🎯 Số điểm giao hàng:</strong> ${displayMarkers.length} điểm</p>
-          <p style="margin:5px 0;font-size:13px"><strong>🗺️ Tọa độ:</strong> ${hubDeparter.departer_lat.toFixed(4)}, ${hubDeparter.departer_long.toFixed(4)}</p>
-        </div>
-      `;
-
-      const departerMarker = new mapboxgl.Marker(departerEl)
-        .setLngLat(departerCoords)
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(hubPopupHTML))
-        .addTo(map.current);
-      markersRef.current.push(departerMarker);
-
-      // Only show boundaries if not in focus mode
-      if (showBoundaries && !focusMode) {
-        const processedCommunes = new Set();
-        displayMarkers.forEach((marker, idx) => {
-          const addressParts = parseAddress(marker.address_destination);
-          const commune = addressParts.commune;
-          if (processedCommunes.has(commune)) return;
-          processedCommunes.add(commune);
-          const boundaryId = `boundary-${idx}`;
-          const fillId = `boundary-fill-${idx}`;
-          const outlineId = `boundary-outline-${idx}`;
-          boundaryLayers.current.push(boundaryId);
-          const circleGeometry = createCircleBoundary(marker.destination_long, marker.destination_lat, 8);
-          const color = getColorForCommune(commune);
-          const area = calculateArea(circleGeometry);
-          if (!map.current.getSource(boundaryId)) {
-            map.current.addSource(boundaryId, {
-              type: 'geojson',
-              data: { type: 'Feature', properties: { name: commune, area: area.toFixed(2) }, geometry: circleGeometry }
+            map.current.easeTo({
+              center: features[0].geometry.coordinates,
+              zoom: zoom
             });
           }
-          if (!map.current.getLayer(fillId)) {
-            map.current.addLayer({ id: fillId, type: 'fill', source: boundaryId, paint: { 'fill-color': color, 'fill-opacity': 0.2 } });
-          }
-          if (!map.current.getLayer(outlineId)) {
-            map.current.addLayer({ id: outlineId, type: 'line', source: boundaryId, paint: { 'line-color': color, 'line-width': 2, 'line-opacity': 0.8 } });
-          }
-          map.current.on('click', fillId, (e) => {
-            const properties = e.features[0].properties;
-            new mapboxgl.Popup().setLngLat(e.lngLat).setHTML(`<div style="padding:10px"><h3 style="margin:0 0 5px 0;color:${color};font-weight:bold">Xã ${properties.name}</h3><p style="margin:5px 0"><strong>Diện tích ước tính:</strong> ${properties.area} km²</p></div>`).addTo(map.current);
-          });
-          map.current.on('mouseenter', fillId, () => { map.current.getCanvas().style.cursor = 'pointer'; });
-          map.current.on('mouseleave', fillId, () => { map.current.getCanvas().style.cursor = ''; });
-        });
-      }
+        );
+      });
 
-      // Loop through displayMarkers instead of all markers
-      for (let index = 0; index < displayMarkers.length; index++) {
-        const marker = displayMarkers[index];
-        const destCoords = [marker.destination_long, marker.destination_lat];
-        const routeData = await fetchRoute(departerCoords, destCoords);
-        const addressParts = parseAddress(marker.address_destination);
-        const commune = addressParts.commune;
-        const communeColor = getColorForCommune(commune);
-        const circleGeometry = createCircleBoundary(marker.destination_long, marker.destination_lat, 8);
-        const area = calculateArea(circleGeometry);
-        const el = document.createElement('div');
-        el.style.cssText = `background-color:${communeColor};width:28px;height:28px;border-radius:50%;border:3px solid white;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:bold;box-shadow:0 3px 6px rgba(0,0,0,0.4)`;
-        el.textContent = marker.order;
-        let popupContent = `<div style="padding:12px;min-width:220px"><h3 style="margin:0 0 10px 0;color:${communeColor};font-weight:bold;font-size:16px">${marker.hub_destination}</h3><div style="border-left:3px solid ${communeColor};padding-left:10px;margin-bottom:10px"><p style="margin:5px 0;font-size:13px"><strong>📍 Địa chỉ:</strong><br/>${marker.address_destination}</p></div><p style="margin:5px 0;font-size:13px"><strong>📦 Số đơn hàng/tháng:</strong> ${marker.order}</p><p style="margin:5px 0;font-size:13px"><strong>🗺️ Diện tích khu vực:</strong> ~${area.toFixed(2)} km²</p>`;
-        if (routeData) {
-          popupContent += `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #eee"><p style="margin:5px 0;font-size:13px"><strong>🚗 Khoảng cách:</strong> ${routeData.distance.toFixed(2)} km</p><p style="margin:5px 0;font-size:13px"><strong>⏱️ Thời gian di chuyển:</strong> ${Math.round(routeData.duration)} phút</p></div>`;
-        }
-        popupContent += `</div>`;
-        const destMarker = new mapboxgl.Marker(el)
-          .setLngLat(destCoords)
-          .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent))
+      // Show popup on unclustered point click
+      map.current.on('click', 'unclustered-point', (e) => {
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        const props = e.features[0].properties;
+
+        const carrierColor = props.carrier_type === '2PL' ? '#4264fb' : '#ff8c00';
+
+        new mapboxgl.Popup()
+          .setLngLat(coordinates)
+          .setHTML(`
+            <div style="padding: 8px; min-width: 200px;">
+              <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #333; font-weight: bold;">
+                📍 ${props.name}
+              </h3>
+              <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                🏠 ${props.address || 'N/A'}
+              </div>
+              ${props.hub_name ? `
+                <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                  🏭 Hub: ${props.hub_name}
+                </div>
+              ` : ''}
+              <div style="font-size: 12px; margin-bottom: 4px;">
+                <span style="
+                  background-color: ${carrierColor}15;
+                  color: ${carrierColor};
+                  padding: 2px 8px;
+                  border-radius: 4px;
+                  font-weight: bold;
+                ">
+                  🏢 ${props.carrier_type}
+                </span>
+              </div>
+              <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                📦 ${props.oders_per_month || 0} orders/tháng
+              </div>
+              ${props.distance_from_hub ? `
+                <div style="
+                  font-size: 12px;
+                  color: #fff;
+                  background-color: #28a745;
+                  padding: 4px 8px;
+                  border-radius: 4px;
+                  margin-top: 6px;
+                  font-weight: bold;
+                ">
+                  📏 ${props.distance_from_hub} km từ hub
+                </div>
+              ` : ''}
+            </div>
+          `)
           .addTo(map.current);
-        markersRef.current.push(destMarker);
-        el.addEventListener('click', () => {
-          if (onMarkerClick) onMarkerClick({ ...marker, routeData });
-        });
-        // In focus mode, always show routes. Otherwise, respect showRoutes setting
-        if (routeData && (focusMode || showRoutes)) {
-          const layerId = `route-${index}`;
-          routeLayers.current.push(layerId);
-          if (!map.current.getSource(layerId)) {
-            map.current.addSource(layerId, { type: 'geojson', data: { type: 'Feature', properties: {}, geometry: routeData.geometry } });
-          }
-          if (!map.current.getLayer(layerId)) {
-            map.current.addLayer({ id: layerId, type: 'line', source: layerId, layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': communeColor, 'line-width': 4, 'line-opacity': 0.7 } });
-          }
-        }
-      }
+      });
 
-      // Fit bounds to displayed markers
-      if (displayMarkers.length > 0) {
-        const bounds = new mapboxgl.LngLatBounds();
-        bounds.extend(departerCoords);
-        displayMarkers.forEach(marker => bounds.extend([marker.destination_long, marker.destination_lat]));
-        map.current.fitBounds(bounds, { padding: 50 });
-      }
-    };
-
-    if (map.current.loaded()) {
-      addMarkersAndRoutes();
-    } else {
-      map.current.on('load', addMarkersAndRoutes);
-    }
+      // Change cursor on hover
+      map.current.on('mouseenter', 'clusters', () => {
+        map.current.getCanvas().style.cursor = 'pointer';
+      });
+      map.current.on('mouseleave', 'clusters', () => {
+        map.current.getCanvas().style.cursor = '';
+      });
+      map.current.on('mouseenter', 'unclustered-point', () => {
+        map.current.getCanvas().style.cursor = 'pointer';
+      });
+      map.current.on('mouseleave', 'unclustered-point', () => {
+        map.current.getCanvas().style.cursor = '';
+      });
+    });
 
     return () => {
-      if (map.current) map.current.off('load', addMarkersAndRoutes);
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
-  }, [markers, onMarkerClick, showBoundaries, showRoutes, focusMode, focusedDestinations]);
+  }, []);
+
+  // Update hub markers
+  useEffect(() => {
+    if (!map.current || !hubs || hubs.length === 0) return;
+
+    // Remove old hub markers
+    hubMarkersRef.current.forEach(marker => marker.remove());
+    hubMarkersRef.current = [];
+
+    // Add hub markers
+    hubs.forEach(hub => {
+      const el = document.createElement('div');
+      const isSelected = selectedHub && selectedHub.id === hub.id;
+
+      // Calculate hub statistics
+      const hubDestinations = destinations.filter(d => d.hub_id === hub.id);
+      const totalOrders = hubDestinations.reduce((sum, d) => sum + (d.oders_per_month || 0), 0);
+      const twoPlCount = hubDestinations.filter(d => d.carrier_type === '2PL').length;
+      const threePlCount = hubDestinations.filter(d => d.carrier_type === '3PL').length;
+
+      // Calculate marker size based on total orders
+      // Base size: 18px, scale up to 36px for high-volume hubs
+      let baseSize = 18;
+      if (totalOrders > 500) baseSize = 36;
+      else if (totalOrders > 300) baseSize = 30;
+      else if (totalOrders > 150) baseSize = 26;
+      else if (totalOrders > 50) baseSize = 22;
+
+      const markerSize = isSelected ? baseSize + 4 : baseSize;
+
+      el.style.cssText = `
+        background-color: ${isSelected ? '#FF0000' : '#FF6B6B'};
+        width: ${markerSize}px;
+        height: ${markerSize}px;
+        border-radius: 50%;
+        border: 3px solid white;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+      `;
+
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([hub.long, hub.lat])
+        .setPopup(
+          new mapboxgl.Popup({ offset: 25, maxWidth: '320px' })
+            .setHTML(`
+              <div style="padding: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+                <h3 style="margin: 0 0 10px 0; font-size: 15px; color: #333; font-weight: bold; border-bottom: 2px solid #4264fb; padding-bottom: 6px;">
+                  🏭 ${hub.name}
+                </h3>
+
+                <div style="margin-bottom: 8px;">
+                  <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                    📍 <strong>Địa chỉ:</strong>
+                  </div>
+                  <div style="font-size: 12px; color: #333; margin-left: 20px;">
+                    ${hub.address || `${hub.province_name}, Cambodia`}
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 8px;">
+                  <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                    🌐 <strong>Tọa độ:</strong>
+                  </div>
+                  <div style="font-size: 11px; color: #333; margin-left: 20px; font-family: monospace;">
+                    Lat: ${hub.lat.toFixed(6)}<br/>
+                    Lng: ${hub.long.toFixed(6)}
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                  <div style="background: #f0f7ff; padding: 8px; border-radius: 6px; border-left: 3px solid #4264fb;">
+                    <div style="font-size: 11px; color: #666; margin-bottom: 2px;">📦 Destinations</div>
+                    <div style="font-size: 16px; font-weight: bold; color: #4264fb;">
+                      ${hubDestinations.length}
+                    </div>
+                    <div style="font-size: 10px; color: #999; margin-top: 2px;">
+                      2PL: ${twoPlCount} | 3PL: ${threePlCount}
+                    </div>
+                  </div>
+
+                  <div style="background: #fff5e6; padding: 8px; border-radius: 6px; border-left: 3px solid #ff8c00;">
+                    <div style="font-size: 11px; color: #666; margin-bottom: 2px;">📊 Orders/tháng</div>
+                    <div style="font-size: 16px; font-weight: bold; color: #ff8c00;">
+                      ${totalOrders.toLocaleString()}
+                    </div>
+                    <div style="font-size: 10px; color: #999; margin-top: 2px;">
+                      Avg: ${hubDestinations.length > 0 ? (totalOrders / hubDestinations.length).toFixed(1) : 0}/dest
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #eee; text-align: center;">
+                  <button
+                    onclick="window.dispatchEvent(new CustomEvent('hub-click', { detail: { hubId: '${hub.id}' } }))"
+                    style="
+                      background: #4264fb;
+                      color: white;
+                      border: none;
+                      padding: 6px 12px;
+                      border-radius: 4px;
+                      font-size: 11px;
+                      cursor: pointer;
+                      font-weight: 500;
+                    "
+                  >
+                    🔍 Xem khu vực phủ sóng
+                  </button>
+                </div>
+              </div>
+            `)
+        )
+        .addTo(map.current);
+
+      hubMarkersRef.current.push(marker);
+    });
+  }, [hubs, selectedHub]);
+
+  // Update destinations layer
+  useEffect(() => {
+    if (!map.current || !map.current.isStyleLoaded()) return;
+    if (!destinations || destinations.length === 0) return;
+
+    // Filter destinations for selected hub
+    const hubDestinations = selectedHub
+      ? destinations.filter(d => d.hub_id === selectedHub.id && d.lat && d.long)
+      : [];
+
+    // Helper function to calculate distance (Haversine formula)
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+      const R = 6371; // Earth's radius in km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    };
+
+    // Create GeoJSON features with distance calculation
+    const features = hubDestinations.map(dest => {
+      let distanceFromHub = null;
+      if (selectedHub) {
+        distanceFromHub = calculateDistance(
+          selectedHub.lat,
+          selectedHub.long,
+          dest.lat,
+          dest.long
+        ).toFixed(2);
+      }
+
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [dest.long, dest.lat]
+        },
+        properties: {
+          id: dest.id,
+          name: dest.name,
+          address: dest.address,
+          carrier_type: dest.carrier_type,
+          oders_per_month: dest.oders_per_month || 0,
+          selected: selectedDestinations.includes(dest.id),
+          distance_from_hub: distanceFromHub,
+          hub_name: selectedHub ? selectedHub.name : 'N/A'
+        }
+      };
+    });
+
+    const source = map.current.getSource('destinations');
+    if (source) {
+      source.setData({
+        type: 'FeatureCollection',
+        features: features
+      });
+    }
+
+    // Fit bounds to show all destinations
+    if (features.length > 0 && selectedHub) {
+      const bounds = new mapboxgl.LngLatBounds();
+      
+      // Add hub to bounds
+      bounds.extend([selectedHub.long, selectedHub.lat]);
+      
+      // Add destinations to bounds
+      features.forEach(feature => {
+        bounds.extend(feature.geometry.coordinates);
+      });
+
+      map.current.fitBounds(bounds, {
+        padding: { top: 100, bottom: 100, left: 450, right: 100 },
+        maxZoom: 12,
+        duration: 1000
+      });
+    }
+  }, [destinations, selectedHub, selectedDestinations]);
+
+  // Draw routes from calculated routes
+  useEffect(() => {
+    if (!map.current || !map.current.isStyleLoaded()) return;
+
+    // Remove old routes
+    routeLayersRef.current.forEach(layerId => {
+      if (map.current.getLayer(layerId)) map.current.removeLayer(layerId);
+      if (map.current.getSource(layerId)) map.current.removeSource(layerId);
+    });
+    routeLayersRef.current = [];
+
+    // If no routes to show, return
+    if (!showRoutes || !calculatedRoutes || calculatedRoutes.length === 0) {
+      return;
+    }
+
+    // Draw routes from calculated data
+    calculatedRoutes.forEach((route, index) => {
+      if (!route.geometry) return;
+
+      const layerId = `route-${route.destId}`;
+
+      // Add source
+      map.current.addSource(layerId, {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: route.geometry
+        }
+      });
+
+      // Add layer with gradient colors
+      const colors = ['#4264fb', '#ff8c00', '#28a745', '#dc3545', '#6f42c1'];
+      const color = colors[index % colors.length];
+
+      map.current.addLayer({
+        id: layerId,
+        type: 'line',
+        source: layerId,
+        paint: {
+          'line-color': color,
+          'line-width': 4,
+          'line-opacity': 0.7
+        }
+      });
+
+      routeLayersRef.current.push(layerId);
+    });
+  }, [calculatedRoutes, showRoutes]);
+
+  // Handle hub territory visualization
+  useEffect(() => {
+    if (!map.current) return;
+
+    const handleHubClick = (event) => {
+      const hubId = event.detail.hubId;
+      const hub = hubs.find(h => h.id === hubId);
+
+      if (!hub) return;
+
+      console.log('🗺️ Showing territory for hub:', hub.name);
+
+      // Get all destinations for this hub
+      const hubDestinations = destinations.filter(d => d.hub_id === hubId);
+
+      if (hubDestinations.length === 0) {
+        alert(`Hub "${hub.name}" chưa có destinations nào.`);
+        return;
+      }
+
+      // Filter destinations with valid coordinates
+      const validDests = hubDestinations.filter(d => d.lat && d.long && d.lat !== '' && d.long !== '');
+
+      if (validDests.length === 0) {
+        alert(`Hub "${hub.name}" có ${hubDestinations.length} destinations nhưng tất cả đều thiếu tọa độ (lat/long).\n\nVui lòng cập nhật tọa độ trong file destinations.json.`);
+        return;
+      }
+
+      // Calculate bounds to fit all destinations + hub
+      const bounds = new mapboxgl.LngLatBounds();
+      bounds.extend([hub.long, hub.lat]); // Add hub
+
+      validDests.forEach(dest => {
+        bounds.extend([dest.long, dest.lat]);
+      });
+
+      // Zoom to bounds with padding
+      map.current.fitBounds(bounds, {
+        padding: { top: 100, bottom: 100, left: 100, right: 100 },
+        maxZoom: 12,
+        duration: 1500
+      });
+
+      // Highlight hub destinations temporarily
+      setTimeout(() => {
+        // Flash effect - update destination markers
+        const destSource = map.current.getSource('destinations');
+        if (destSource) {
+          const currentData = destSource._data;
+          // Trigger re-render by updating source
+          destSource.setData(currentData);
+        }
+      }, 1600);
+    };
+
+    window.addEventListener('hub-click', handleHubClick);
+
+    return () => {
+      window.removeEventListener('hub-click', handleHubClick);
+    };
+  }, [hubs, destinations]);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
-      <div style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: 'rgba(255,255,255,0.9)', padding: '10px', borderRadius: '4px', fontSize: '12px', fontFamily: 'monospace', zIndex: 1 }}>
-        Lng: {lng} | Lat: {lat} | Zoom: {zoom}
-      </div>
-    </div>
+    <div
+      ref={mapContainer}
+      style={{
+        width: '100%',
+        height: '100%'
+      }}
+    />
   );
 };
 
