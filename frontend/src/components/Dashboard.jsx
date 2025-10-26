@@ -9,12 +9,17 @@ const Dashboard = ({
   selectedDestinations,
   onDestinationsChange,
   onCalculateDistance,
+  calculateDistance,
   provinceFilter,
   districtFilter,
   wardFilter,
+  carrierTypeFilter,
+  distanceFilter,
   onProvinceFilterChange,
   onDistrictFilterChange,
   onWardFilterChange,
+  onCarrierTypeFilterChange,
+  onDistanceFilterChange,
   showBoundaries,
   onToggleBoundaries,
   showRoutes,
@@ -435,6 +440,11 @@ const Dashboard = ({
             }}>
               <h3 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#333' }}>
                 🔍 Lọc điểm đến
+                {selectedHub && (
+                  <span style={{ fontSize: '11px', color: '#27AE60', fontWeight: 'normal', marginLeft: '8px' }}>
+                    (Showing {filteredDestinations.length}/{availableDestinations.length})
+                  </span>
+                )}
                 {!selectedHub && (
                   <span style={{ fontSize: '11px', color: '#999', fontWeight: 'normal', marginLeft: '8px' }}>
                     (Chọn hub trước)
@@ -505,7 +515,7 @@ const Dashboard = ({
               </div>
 
               {/* Ward Filter */}
-              <div>
+              <div style={{ marginBottom: '10px' }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontSize: '12px', color: '#666' }}>
                   Xã/Phường
                 </label>
@@ -527,6 +537,74 @@ const Dashboard = ({
                     <option key={w} value={w}>{w}</option>
                   ))}
                 </select>
+              </div>
+
+              {/* Divider */}
+              <div style={{
+                borderTop: '1px dashed #ddd',
+                margin: '12px 0',
+                paddingTop: '12px'
+              }}>
+                <div style={{ fontSize: '11px', color: '#999', marginBottom: '10px', fontWeight: 'bold' }}>
+                  🔧 LỌC NÂNG CAO
+                </div>
+              </div>
+
+              {/* Carrier Type Filter */}
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontSize: '12px', color: '#666' }}>
+                  🚚 Carrier Type
+                </label>
+                <select
+                  value={carrierTypeFilter}
+                  onChange={(e) => onCarrierTypeFilterChange(e.target.value)}
+                  disabled={!selectedHub}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '13px',
+                    backgroundColor: !selectedHub ? '#f5f5f5' : '#fff',
+                    cursor: !selectedHub ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  <option value="">Tất cả carrier types</option>
+                  <option value="2PL">🟢 2PL</option>
+                  <option value="3PL">🟠 3PL</option>
+                </select>
+              </div>
+
+              {/* Distance Filter */}
+              <div>
+                <label style={{ display: 'block', marginBottom: '5px', fontSize: '12px', color: '#666' }}>
+                  📏 Khoảng cách từ hub
+                </label>
+                <input
+                  type="range"
+                  min="5"
+                  max="100"
+                  step="5"
+                  value={distanceFilter}
+                  onChange={(e) => onDistanceFilterChange(Number(e.target.value))}
+                  disabled={!selectedHub}
+                  style={{
+                    width: '100%',
+                    cursor: !selectedHub ? 'not-allowed' : 'pointer'
+                  }}
+                />
+                <div style={{
+                  textAlign: 'center',
+                  fontSize: '13px',
+                  color: !selectedHub ? '#999' : '#333',
+                  marginTop: '5px'
+                }}>
+                  ≤ <span style={{
+                    fontWeight: 'bold',
+                    color: !selectedHub ? '#999' : '#E74C3C',
+                    fontSize: '15px'
+                  }}>{distanceFilter}</span> km
+                </div>
               </div>
             </div>
 

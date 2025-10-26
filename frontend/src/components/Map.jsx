@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { createCircleBoundary, getColorForCommune } from '../utils/boundaries';
@@ -32,6 +32,19 @@ const getColorForDistrict = (districtName) => {
   return `hsl(${hue}, 65%, 55%)`; // Slightly muted colors
 };
 
+// Helper function to calculate distance (Haversine formula)
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+};
+
 const Map = ({
   hubs,
   destinations,
@@ -49,6 +62,7 @@ const Map = ({
   const routeDestMarkersRef = useRef([]); // Markers for route destinations
   const hubTerritoryLayerRef = useRef(null);
   const boundaryLayersRef = useRef([]); // District boundary layers
+  const [mapLoaded, setMapLoaded] = useState(false); // Track map load state
   const initialCenter = [104.9, 12.5]; // Center of Cambodia
   const initialZoom = 6.5;
 
@@ -68,6 +82,9 @@ const Map = ({
 
     // Wait for map to load before adding sources
     map.current.on('load', () => {
+      console.log('🗺️ Map loaded successfully');
+      setMapLoaded(true); // Set map loaded state
+
       // Add destinations source with clustering
       map.current.addSource('destinations', {
         type: 'geojson',
@@ -193,6 +210,28 @@ const Map = ({
 
         const carrierColor = props.carrier_type === '2PL' ? '#4264fb' : '#ff8c00';
 
+        // Calculate distance from selected hub if available
+        let distanceHTML = '';
+        if (selectedHub && selectedHub.lat && selectedHub.long) {
+          const distance = calculateDistance(
+            selectedHub.lat, selectedHub.long,
+            coordinates[1], coordinates[0]
+          );
+          distanceHTML = `
+            <div style="
+              font-size: 12px;
+              color: #fff;
+              background-color: #28a745;
+              padding: 4px 8px;
+              border-radius: 4px;
+              margin-top: 6px;
+              font-weight: bold;
+            ">
+              📏 ${distance.toFixed(2)} km từ ${selectedHub.name}
+            </div>
+          `;
+        }
+
         new mapboxgl.Popup()
           .setLngLat(coordinates)
           .setHTML(`
@@ -222,19 +261,7 @@ const Map = ({
               <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
                 📦 ${props.oders_per_month || 0} orders/tháng
               </div>
-              ${props.distance_from_hub ? `
-                <div style="
-                  font-size: 12px;
-                  color: #fff;
-                  background-color: #28a745;
-                  padding: 4px 8px;
-                  border-radius: 4px;
-                  margin-top: 6px;
-                  font-weight: bold;
-                ">
-                  📏 ${props.distance_from_hub} km từ hub
-                </div>
-              ` : ''}
+              ${distanceHTML}
             </div>
           `)
           .addTo(map.current);
@@ -652,7 +679,7 @@ const Map = ({
 
   // Handle district boundaries visualization (Google Maps style)
   useEffect(() => {
-    if (!map.current || !map.current.loaded()) return;
+    if (!map.current || !mapLoaded) return;
 
     // Remove existing boundary layers
     boundaryLayersRef.current.forEach(layerId => {
@@ -808,7 +835,7 @@ const Map = ({
       });
       console.warn(`⚠️ ${hubDistrictNames.size - matchedCount} districts not found in GeoJSON:`, unmatched);
     }
-  }, [showBoundaries, selectedHub, destinations, districts]);
+  }, [showBoundaries, selectedHub, destinations, districts, mapLoaded]);
 
   // Handle hub territory visualization
   useEffect(() => {

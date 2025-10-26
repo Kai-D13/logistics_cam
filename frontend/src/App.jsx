@@ -24,6 +24,8 @@ function App() {
   const [provinceFilter, setProvinceFilter] = useState('');
   const [districtFilter, setDistrictFilter] = useState('');
   const [wardFilter, setWardFilter] = useState('');
+  const [carrierTypeFilter, setCarrierTypeFilter] = useState(''); // '' = all, '2PL', '3PL'
+  const [distanceFilter, setDistanceFilter] = useState(30); // km
 
   // Load hubs, destinations, and districts
   useEffect(() => {
@@ -71,32 +73,68 @@ function App() {
     };
   }, [hubs]);
 
+  // Calculate straight-line distance between two points (Haversine formula)
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
   // Get destinations for selected hub
   const getHubDestinations = () => {
     if (!selectedHub) return [];
     return destinations.filter(dest => dest.hub_id === selectedHub.id);
   };
 
-  // Get filtered destinations based on province/district/ward
+  // Get filtered destinations based on province/district/ward/carrier/distance
   const getFilteredDestinations = () => {
     let filtered = getHubDestinations();
 
+    // Province filter
     if (provinceFilter) {
       filtered = filtered.filter(d =>
         d.province_name.toLowerCase().includes(provinceFilter.toLowerCase())
       );
     }
 
+    // District filter
     if (districtFilter) {
       filtered = filtered.filter(d =>
         d.district_name.toLowerCase().includes(districtFilter.toLowerCase())
       );
     }
 
+    // Ward filter
     if (wardFilter) {
       filtered = filtered.filter(d =>
         d.ward_name.toLowerCase().includes(wardFilter.toLowerCase())
       );
+    }
+
+    // Carrier type filter
+    if (carrierTypeFilter) {
+      filtered = filtered.filter(d => d.carrier_type === carrierTypeFilter);
+    }
+
+    // Distance filter
+    if (selectedHub && distanceFilter) {
+      filtered = filtered.filter(d => {
+        // Skip destinations without coordinates
+        if (!d.lat || !d.long || d.lat === '' || d.long === '') {
+          return false;
+        }
+        const distance = calculateDistance(
+          selectedHub.lat, selectedHub.long,
+          d.lat, d.long
+        );
+        return distance <= distanceFilter;
+      });
     }
 
     return filtered;
@@ -110,6 +148,8 @@ function App() {
     setProvinceFilter('');
     setDistrictFilter('');
     setWardFilter('');
+    setCarrierTypeFilter('');
+    // Don't reset distance filter - keep it at 30km
   };
 
   const handleCalculateDistance = async (destIds) => {
@@ -214,12 +254,17 @@ function App() {
         selectedDestinations={selectedDestinations}
         onDestinationsChange={setSelectedDestinations}
         onCalculateDistance={handleCalculateDistance}
+        calculateDistance={calculateDistance}
         provinceFilter={provinceFilter}
         districtFilter={districtFilter}
         wardFilter={wardFilter}
+        carrierTypeFilter={carrierTypeFilter}
+        distanceFilter={distanceFilter}
         onProvinceFilterChange={setProvinceFilter}
         onDistrictFilterChange={setDistrictFilter}
         onWardFilterChange={setWardFilter}
+        onCarrierTypeFilterChange={setCarrierTypeFilter}
+        onDistanceFilterChange={setDistanceFilter}
         showBoundaries={showBoundaries}
         onToggleBoundaries={setShowBoundaries}
         showRoutes={showRoutes}
