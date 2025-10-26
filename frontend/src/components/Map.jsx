@@ -1,12 +1,41 @@
 import { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { createCircleBoundary, getColorForCommune } from '../utils/boundaries';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1Ijoia2FpZHJvZ2VyIiwiYSI6ImNtaDM4bnB2cjBuN28ybnM5NmV0ZTluZHEifQ.YHW9Erg1h5egssNhthQiZw';
+
+// Helper function to normalize district names for matching
+const normalizeDistrictName = (name) => {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, '') // Remove all spaces
+    .replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
+    .replace(/[èéẹẻẽêềếệểễ]/g, 'e')
+    .replace(/[ìíịỉĩ]/g, 'i')
+    .replace(/[òóọỏõôồốộổỗơờớợởỡ]/g, 'o')
+    .replace(/[ùúụủũưừứựửữ]/g, 'u')
+    .replace(/[ỳýỵỷỹ]/g, 'y')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]/g, ''); // Remove special chars
+};
+
+// Helper function to get color for district (Google Maps style)
+const getColorForDistrict = (districtName) => {
+  // Generate consistent color based on district name
+  let hash = 0;
+  for (let i = 0; i < districtName.length; i++) {
+    hash = districtName.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash % 360);
+  return `hsl(${hue}, 65%, 55%)`; // Slightly muted colors
+};
 
 const Map = ({
   hubs,
   destinations,
+  districts,
   selectedHub,
   selectedDestinations,
   showBoundaries,
@@ -19,6 +48,7 @@ const Map = ({
   const routeLayersRef = useRef([]);
   const routeDestMarkersRef = useRef([]); // Markers for route destinations
   const hubTerritoryLayerRef = useRef(null);
+  const boundaryLayersRef = useRef([]); // District boundary layers
   const initialCenter = [104.9, 12.5]; // Center of Cambodia
   const initialZoom = 6.5;
 
@@ -619,6 +649,166 @@ const Map = ({
       }
     });
   }, [calculatedRoutes, showRoutes, destinations]);
+
+  // Handle district boundaries visualization (Google Maps style)
+  useEffect(() => {
+    if (!map.current || !map.current.loaded()) return;
+
+    // Remove existing boundary layers
+    boundaryLayersRef.current.forEach(layerId => {
+      try {
+        const fillId = `${layerId}-fill`;
+        const outlineId = `${layerId}-outline`;
+        const labelId = `${layerId}-label`;
+        if (map.current.getLayer(fillId)) map.current.removeLayer(fillId);
+        if (map.current.getLayer(outlineId)) map.current.removeLayer(outlineId);
+        if (map.current.getLayer(labelId)) map.current.removeLayer(labelId);
+        if (map.current.getSource(layerId)) map.current.removeSource(layerId);
+      } catch (e) {
+        console.error('Error removing boundary layer:', e);
+      }
+    });
+    boundaryLayersRef.current = [];
+
+    // Only show boundaries if enabled and hub is selected
+    if (!showBoundaries || !selectedHub || !districts || districts.length === 0) return;
+
+    // Get destinations for selected hub
+    const hubDestinations = destinations.filter(d =>
+      d.hub_id === selectedHub.id &&
+      d.lat &&
+      d.long &&
+      d.lat !== '' &&
+      d.long !== ''
+    );
+
+    if (hubDestinations.length === 0) return;
+
+    // Extract unique districts from hub destinations
+    const hubDistrictNames = new Set();
+    const districtStats = {}; // Track destinations per district
+
+    hubDestinations.forEach(dest => {
+      // Extract district from address (format: "Ward, District, Province")
+      const addressParts = (dest.address || '').split(',').map(p => p.trim());
+      const districtName = addressParts[1]; // District is second part
+
+      if (districtName) {
+        hubDistrictNames.add(districtName);
+
+        // Count destinations per district
+        if (!districtStats[districtName]) {
+          districtStats[districtName] = {
+            count: 0,
+            orders: 0,
+            destinations: []
+          };
+        }
+        districtStats[districtName].count++;
+        districtStats[districtName].orders += dest.oders_per_month || 0;
+        districtStats[districtName].destinations.push(dest.name);
+      }
+    });
+
+    console.log(`🗺️ Hub ${selectedHub.name} covers ${hubDistrictNames.size} districts:`, Array.from(hubDistrictNames));
+
+    // Match districts from GeoJSON
+    let matchedCount = 0;
+    let boundaryIndex = 0;
+
+    districts.forEach(feature => {
+      const geoDistrictName = feature.properties.NAME_2;
+      const normalizedGeoName = normalizeDistrictName(geoDistrictName);
+
+      // Check if this district is in hub's coverage
+      let matched = false;
+      let matchedDistrictName = '';
+
+      for (const hubDistrict of hubDistrictNames) {
+        const normalizedHubName = normalizeDistrictName(hubDistrict);
+        if (normalizedGeoName === normalizedHubName) {
+          matched = true;
+          matchedDistrictName = hubDistrict;
+          break;
+        }
+      }
+
+      if (!matched) return;
+
+      matchedCount++;
+      const boundaryId = `district-boundary-${boundaryIndex}`;
+      const stats = districtStats[matchedDistrictName] || { count: 0, orders: 0 };
+      const color = getColorForDistrict(geoDistrictName);
+
+      try {
+        // Add source with GeoJSON geometry
+        map.current.addSource(boundaryId, {
+          type: 'geojson',
+          data: feature
+        });
+
+        // Add fill layer (Google Maps style - subtle)
+        const fillId = `${boundaryId}-fill`;
+        map.current.addLayer({
+          id: fillId,
+          type: 'fill',
+          source: boundaryId,
+          paint: {
+            'fill-color': color,
+            'fill-opacity': 0.12 // Very subtle like Google Maps
+          }
+        });
+
+        // Add outline layer (Google Maps style - red dashed)
+        const outlineId = `${boundaryId}-outline`;
+        map.current.addLayer({
+          id: outlineId,
+          type: 'line',
+          source: boundaryId,
+          paint: {
+            'line-color': '#E74C3C', // Red like Google Maps
+            'line-width': 2,
+            'line-dasharray': [3, 2], // Dashed line
+            'line-opacity': 0.7
+          }
+        });
+
+        // Add label with district name and stats
+        const labelId = `${boundaryId}-label`;
+        map.current.addLayer({
+          id: labelId,
+          type: 'symbol',
+          source: boundaryId,
+          layout: {
+            'text-field': `${matchedDistrictName}\n${stats.count} destinations • ${stats.orders} orders`,
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+            'text-size': 12,
+            'text-anchor': 'center'
+          },
+          paint: {
+            'text-color': '#2C3E50',
+            'text-halo-color': '#FFFFFF',
+            'text-halo-width': 2
+          }
+        });
+
+        boundaryLayersRef.current.push(boundaryId);
+        boundaryIndex++;
+      } catch (e) {
+        console.error(`Error adding boundary for district ${geoDistrictName}:`, e);
+      }
+    });
+
+    console.log(`✅ Added ${matchedCount} district boundaries (${hubDistrictNames.size} districts in hub coverage)`);
+
+    if (matchedCount < hubDistrictNames.size) {
+      const unmatched = Array.from(hubDistrictNames).filter(name => {
+        const normalized = normalizeDistrictName(name);
+        return !districts.some(f => normalizeDistrictName(f.properties.NAME_2) === normalized);
+      });
+      console.warn(`⚠️ ${hubDistrictNames.size - matchedCount} districts not found in GeoJSON:`, unmatched);
+    }
+  }, [showBoundaries, selectedHub, destinations, districts]);
 
   // Handle hub territory visualization
   useEffect(() => {

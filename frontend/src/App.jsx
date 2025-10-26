@@ -10,6 +10,7 @@ function App() {
   // Data states
   const [hubs, setHubs] = useState([]);
   const [destinations, setDestinations] = useState([]);
+  const [districts, setDistricts] = useState([]); // GeoJSON districts
   const [loading, setLoading] = useState(true);
 
   // UI states
@@ -24,15 +25,17 @@ function App() {
   const [districtFilter, setDistrictFilter] = useState('');
   const [wardFilter, setWardFilter] = useState('');
 
-  // Load hubs and destinations
+  // Load hubs, destinations, and districts
   useEffect(() => {
     Promise.all([
       fetch('/hubs.json').then(res => res.json()),
-      fetch('/destinations.json').then(res => res.json())
+      fetch('/destinations.json').then(res => res.json()),
+      fetch('/districts.geojson').then(res => res.json())
     ])
-      .then(([hubsData, destinationsData]) => {
+      .then(([hubsData, destinationsData, districtsData]) => {
         setHubs(hubsData);
         setDestinations(destinationsData);
+        setDistricts(districtsData.features || []);
         // Set default hub to first one
         if (hubsData.length > 0) {
           setSelectedHub(hubsData[0]);
@@ -157,6 +160,7 @@ function App() {
             distance: data.routes[0].distance / 1000,
             duration: data.routes[0].duration / 60,
             orders: dest.oders_per_month || 0,
+            carrier_type: dest.carrier_type || 'N/A', // Add carrier type
             geometry: data.routes[0].geometry // Store geometry for map
           });
           console.log(`✅ Route calculated for ${dest.name}: ${(data.routes[0].distance / 1000).toFixed(2)} km`);
@@ -263,6 +267,7 @@ function App() {
           <Map
             hubs={hubs}
             destinations={destinations}
+            districts={districts}
             selectedHub={selectedHub}
             selectedDestinations={selectedDestinations}
             showBoundaries={showBoundaries}

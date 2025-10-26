@@ -705,25 +705,40 @@ const Dashboard = ({
                   </div>
                 </div>
                 <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                  {calculatedRoutes.map((route, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        padding: '8px',
-                        marginBottom: '8px',
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '4px',
-                        fontSize: '12px'
-                      }}
-                    >
-                      <div style={{ fontWeight: 'bold', color: '#333', marginBottom: '3px' }}>
-                        {route.destination}
+                  {calculatedRoutes.map((route, idx) => {
+                    // Determine carrier type badge color
+                    const carrierBadgeStyle = {
+                      display: 'inline-block',
+                      padding: '2px 6px',
+                      borderRadius: '3px',
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                      marginLeft: '6px',
+                      backgroundColor: route.carrier_type === '2PL' ? '#d4edda' : route.carrier_type === '3PL' ? '#d1ecf1' : '#e2e3e5',
+                      color: route.carrier_type === '2PL' ? '#155724' : route.carrier_type === '3PL' ? '#0c5460' : '#383d41'
+                    };
+
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '8px',
+                          marginBottom: '8px',
+                          backgroundColor: '#f8f9fa',
+                          borderRadius: '4px',
+                          fontSize: '12px'
+                        }}
+                      >
+                        <div style={{ fontWeight: 'bold', color: '#333', marginBottom: '3px' }}>
+                          {route.destination}
+                          <span style={carrierBadgeStyle}>{route.carrier_type}</span>
+                        </div>
+                        <div style={{ color: '#666' }}>
+                          📏 {route.distance.toFixed(2)} km • ⏱️ {route.duration.toFixed(0)} phút • 📦 {route.orders} orders
+                        </div>
                       </div>
-                      <div style={{ color: '#666' }}>
-                        📏 {route.distance.toFixed(2)} km • ⏱️ {route.duration.toFixed(0)} phút • 📦 {route.orders} orders
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -748,7 +763,7 @@ const Dashboard = ({
                   style={{ marginRight: '10px' }}
                 />
                 <span style={{ fontSize: '14px', color: '#333' }}>
-                  Hiển thị ranh giới xã
+                  Hiển thị ranh giới quận
                 </span>
               </label>
             </div>
