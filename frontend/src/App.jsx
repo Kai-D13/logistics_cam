@@ -318,6 +318,8 @@ function App() {
             showBoundaries={showBoundaries}
             showRoutes={showRoutes}
             calculatedRoutes={calculatedRoutes}
+            carrierTypeFilter={carrierTypeFilter}
+            distanceFilter={distanceFilter}
           />
         </div>
       </div>

@@ -606,6 +606,65 @@ const Dashboard = ({
                   }}>{distanceFilter}</span> km
                 </div>
               </div>
+
+              {/* Filter Summary Badge */}
+              {selectedHub && (carrierTypeFilter || distanceFilter < 100) && (() => {
+                const totalDests = availableDestinations.length;
+                const matchingDests = filteredDestinations.length;
+                const filteredOutCount = totalDests - matchingDests;
+
+                // Calculate breakdown
+                let filteredByCarrier = 0;
+                let filteredByDistance = 0;
+                let filteredByBoth = 0;
+
+                if (filteredOutCount > 0) {
+                  availableDestinations.forEach(dest => {
+                    const matchesCarrier = !carrierTypeFilter || dest.carrier_type === carrierTypeFilter;
+                    const distance = calculateDistance(
+                      selectedHub.lat, selectedHub.long,
+                      dest.lat, dest.long
+                    );
+                    const matchesDistance = !distanceFilter || distance <= distanceFilter;
+
+                    if (!matchesCarrier && !matchesDistance) {
+                      filteredByBoth++;
+                    } else if (!matchesCarrier) {
+                      filteredByCarrier++;
+                    } else if (!matchesDistance) {
+                      filteredByDistance++;
+                    }
+                  });
+                }
+
+                return (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '10px',
+                    backgroundColor: filteredOutCount > 0 ? '#fff3cd' : '#d4edda',
+                    border: `1px solid ${filteredOutCount > 0 ? '#ffc107' : '#28a745'}`,
+                    borderRadius: '6px',
+                    fontSize: '12px'
+                  }}>
+                    <div style={{ fontWeight: 'bold', marginBottom: '6px', color: '#333' }}>
+                      📊 Filter Summary
+                    </div>
+                    <div style={{ color: '#666', lineHeight: '1.6' }}>
+                      <div>✅ Matching: <strong style={{ color: '#28a745' }}>{matchingDests}</strong></div>
+                      {filteredOutCount > 0 && (
+                        <>
+                          <div>❌ Filtered out: <strong style={{ color: '#dc3545' }}>{filteredOutCount}</strong></div>
+                          <div style={{ marginLeft: '20px', fontSize: '11px', marginTop: '4px' }}>
+                            {filteredByCarrier > 0 && <div>• {filteredByCarrier} wrong carrier type</div>}
+                            {filteredByDistance > 0 && <div>• {filteredByDistance} too far (&gt;{distanceFilter}km)</div>}
+                            {filteredByBoth > 0 && <div>• {filteredByBoth} both reasons</div>}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Destination List */}
@@ -674,6 +733,36 @@ const Dashboard = ({
                     const carrierColor = dest.carrier_type === '2PL' ? '#4264fb' : '#ff8c00';
                     const carrierBg = dest.carrier_type === '2PL' ? '#e3f2fd' : '#fff3e0';
 
+                    // Calculate distance and get color zone
+                    let distance = null;
+                    let distanceColor = '#999';
+                    let distanceLabel = '';
+
+                    if (selectedHub && dest.lat && dest.long) {
+                      distance = calculateDistance(
+                        selectedHub.lat, selectedHub.long,
+                        dest.lat, dest.long
+                      );
+
+                      // Color-coded zones
+                      if (distance <= 10) {
+                        distanceColor = '#28a745'; // Green - Very close
+                        distanceLabel = '🟢';
+                      } else if (distance <= 20) {
+                        distanceColor = '#ffc107'; // Yellow - Close
+                        distanceLabel = '🟡';
+                      } else if (distance <= 30) {
+                        distanceColor = '#ff8c00'; // Orange - Medium
+                        distanceLabel = '🟠';
+                      } else if (distance <= 50) {
+                        distanceColor = '#dc3545'; // Red - Far
+                        distanceLabel = '🔴';
+                      } else {
+                        distanceColor = '#6c757d'; // Gray - Very far
+                        distanceLabel = '⚫';
+                      }
+                    }
+
                     return (
                       <label
                         key={dest.id}
@@ -717,10 +806,29 @@ const Dashboard = ({
                           <div style={{ fontSize: '11px', color: '#666' }}>
                             {dest.ward_name}, {dest.district_name}
                           </div>
-                          <div style={{ fontSize: '11px', color: '#999' }}>
-                            📦 {dest.oders_per_month || 0} orders/tháng
+                          <div style={{
+                            fontSize: '11px',
+                            color: '#999',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            flexWrap: 'wrap'
+                          }}>
+                            <span>📦 {dest.oders_per_month || 0} orders/tháng</span>
+                            {distance !== null && (
+                              <span style={{
+                                fontSize: '11px',
+                                padding: '2px 6px',
+                                borderRadius: '3px',
+                                backgroundColor: `${distanceColor}15`,
+                                color: distanceColor,
+                                fontWeight: 'bold'
+                              }}>
+                                {distanceLabel} {distance.toFixed(1)}km
+                              </span>
+                            )}
                             {showAllDestinations && (
-                              <span style={{ marginLeft: '8px', color: '#666' }}>
+                              <span style={{ color: '#666' }}>
                                 • Hub: {hubs.find(h => h.id === dest.hub_id)?.name || 'N/A'}
                               </span>
                             )}

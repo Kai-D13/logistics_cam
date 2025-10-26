@@ -53,7 +53,9 @@ const Map = ({
   selectedDestinations,
   showBoundaries,
   showRoutes,
-  calculatedRoutes
+  calculatedRoutes,
+  carrierTypeFilter,
+  distanceFilter
 }) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -177,8 +179,13 @@ const Map = ({
           'circle-stroke-color': '#fff',
           'circle-opacity': [
             'case',
+            // If doesn't match filter, fade to 30%
+            ['!', ['boolean', ['get', 'matchesFilter'], true]],
+            0.3,
+            // If selected, full opacity
             ['boolean', ['get', 'selected'], false],
             1,
+            // Default: 80% opacity
             0.8
           ]
         }
@@ -210,13 +217,11 @@ const Map = ({
 
         const carrierColor = props.carrier_type === '2PL' ? '#4264fb' : '#ff8c00';
 
-        // Calculate distance from selected hub if available
+        // Calculate distance from destination's actual hub (not selectedHub)
+        // This ensures accuracy when in cross-hub mode or when viewing all destinations
         let distanceHTML = '';
-        if (selectedHub && selectedHub.lat && selectedHub.long) {
-          const distance = calculateDistance(
-            selectedHub.lat, selectedHub.long,
-            coordinates[1], coordinates[0]
-          );
+        if (props.distance_from_hub && props.hub_name) {
+          // Use pre-calculated distance from GeoJSON properties
           distanceHTML = `
             <div style="
               font-size: 12px;
@@ -227,7 +232,7 @@ const Map = ({
               margin-top: 6px;
               font-weight: bold;
             ">
-              📏 ${distance.toFixed(2)} km từ ${selectedHub.name}
+              📏 ${parseFloat(props.distance_from_hub).toFixed(2)} km từ ${props.hub_name}
             </div>
           `;
         }
@@ -494,6 +499,19 @@ const Map = ({
         ).toFixed(2);
       }
 
+      // Check if destination matches filters
+      let matchesFilter = true;
+
+      // Carrier type filter
+      if (carrierTypeFilter && dest.carrier_type !== carrierTypeFilter) {
+        matchesFilter = false;
+      }
+
+      // Distance filter
+      if (distanceFilter && distanceFromHub && parseFloat(distanceFromHub) > distanceFilter) {
+        matchesFilter = false;
+      }
+
       return {
         type: 'Feature',
         geometry: {
@@ -508,7 +526,8 @@ const Map = ({
           oders_per_month: dest.oders_per_month || 0,
           selected: selectedDestinations.includes(dest.id),
           distance_from_hub: distanceFromHub,
-          hub_name: selectedHub ? selectedHub.name : 'N/A'
+          hub_name: selectedHub ? selectedHub.name : 'N/A',
+          matchesFilter: matchesFilter
         }
       };
     });
@@ -554,7 +573,84 @@ const Map = ({
         console.warn('Error fitting bounds:', error);
       }
     }
-  }, [destinations, selectedHub, selectedDestinations]);
+  }, [destinations, selectedHub, selectedDestinations, carrierTypeFilter, distanceFilter]);
+
+  // Draw distance circle (filter radius)
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+
+    const circleLayerId = 'distance-circle';
+    const circleFillId = 'distance-circle-fill';
+
+    // Remove existing circle layers
+    if (map.current.getLayer(circleFillId)) map.current.removeLayer(circleFillId);
+    if (map.current.getLayer(circleLayerId)) map.current.removeLayer(circleLayerId);
+    if (map.current.getSource(circleLayerId)) map.current.removeSource(circleLayerId);
+
+    // Only draw circle if hub is selected and distance filter is active
+    if (!selectedHub || !distanceFilter) return;
+
+    // Create circle GeoJSON (approximate circle with polygon)
+    const createCircle = (center, radiusInKm, points = 64) => {
+      const coords = {
+        latitude: center[1],
+        longitude: center[0]
+      };
+
+      const km = radiusInKm;
+      const ret = [];
+      const distanceX = km / (111.320 * Math.cos(coords.latitude * Math.PI / 180));
+      const distanceY = km / 110.574;
+
+      for (let i = 0; i < points; i++) {
+        const theta = (i / points) * (2 * Math.PI);
+        const x = distanceX * Math.cos(theta);
+        const y = distanceY * Math.sin(theta);
+        ret.push([coords.longitude + x, coords.latitude + y]);
+      }
+      ret.push(ret[0]); // Close the circle
+
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [ret]
+        }
+      };
+    };
+
+    const circle = createCircle([selectedHub.long, selectedHub.lat], distanceFilter);
+
+    // Add circle source
+    map.current.addSource(circleLayerId, {
+      type: 'geojson',
+      data: circle
+    });
+
+    // Add circle fill (light blue, semi-transparent)
+    map.current.addLayer({
+      id: circleFillId,
+      type: 'fill',
+      source: circleLayerId,
+      paint: {
+        'fill-color': '#4264fb',
+        'fill-opacity': 0.08
+      }
+    });
+
+    // Add circle outline (blue dashed line)
+    map.current.addLayer({
+      id: circleLayerId,
+      type: 'line',
+      source: circleLayerId,
+      paint: {
+        'line-color': '#4264fb',
+        'line-width': 2,
+        'line-dasharray': [3, 3]
+      }
+    });
+
+  }, [selectedHub, distanceFilter, mapLoaded]);
 
   // Draw routes from calculated routes
   useEffect(() => {
