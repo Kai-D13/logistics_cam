@@ -43,3 +43,8 @@ Thumbs.db
 *.temp
 .cache/
 
+# Analysis files (local only, not for deployment)
+scripts/*.csv
+scripts/*_REPORT.md
+scripts/hub_destinations_*.csv
+scripts/DISTANCE_ANALYSIS_REPORT.md
