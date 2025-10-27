@@ -143,6 +143,91 @@ const Dashboard = ({
     setIsCalculating(false);
   };
 
+  const handleExportCSV = () => {
+    if (calculatedRoutes.length === 0) {
+      alert('Không có dữ liệu để xuất. Vui lòng tính khoảng cách trước.');
+      return;
+    }
+
+    // Prepare CSV data
+    const csvRows = [];
+
+    // Header with metadata
+    csvRows.push('# LOGISTICS HUB OPTIMIZATION - ROUTE CALCULATION EXPORT');
+    csvRows.push(`# Ngày xuất: ${new Date().toLocaleString('vi-VN')}`);
+    csvRows.push('');
+
+    // Hub information
+    csvRows.push('# THÔNG TIN HUB XUẤT PHÁT');
+    csvRows.push(`Hub ID,Hub Name,Province,Latitude,Longitude`);
+    csvRows.push(`${selectedHub.id},${selectedHub.name},${selectedHub.province_name},${selectedHub.lat},${selectedHub.long}`);
+    csvRows.push('');
+
+    // Filter information
+    csvRows.push('# BỘ LỌC ĐÃ ÁP DỤNG');
+    csvRows.push(`Mode,${showAllDestinations ? 'Cross-hub (Tất cả destinations)' : 'Single-hub'}`);
+    csvRows.push(`Tỉnh/Thành phố,${provinceFilter || 'Tất cả'}`);
+    csvRows.push(`Quận/Huyện,${districtFilter || 'Tất cả'}`);
+    csvRows.push(`Xã/Phường,${wardFilter || 'Tất cả'}`);
+    csvRows.push(`Carrier Type,${carrierTypeFilter || 'Tất cả carrier types'}`);
+    csvRows.push(`Khoảng cách tối đa,${distanceFilter ? `<= ${distanceFilter}km` : 'Không giới hạn'}`);
+    csvRows.push('');
+
+    // Summary
+    csvRows.push('# TỔNG KẾT');
+    csvRows.push(`Tổng số destinations,${calculatedRoutes.length}`);
+    csvRows.push(`Tổng khoảng cách,${totalDistance.toFixed(2)} km`);
+    csvRows.push(`Tổng thời gian,${(totalDuration / 60).toFixed(2)} giờ`);
+    csvRows.push(`Tổng orders,${totalOrders} orders/tháng`);
+    csvRows.push('');
+
+    // Route details header
+    csvRows.push('# CHI TIẾT TUYẾN ĐƯỜNG');
+    csvRows.push('STT,Destination ID,Destination Name,Ward,District,Province,Carrier Type,Distance (km),Duration (minutes),Orders/Month,Hub ID,Hub Name');
+
+    // Route details data
+    calculatedRoutes.forEach((route, index) => {
+      // Find destination details
+      const dest = destinations.find(d => d.name === route.destination);
+      if (dest) {
+        csvRows.push([
+          index + 1,
+          dest.id,
+          `"${route.destination}"`,
+          `"${dest.ward_name}"`,
+          `"${dest.district_name}"`,
+          `"${dest.province_name}"`,
+          route.carrier_type,
+          route.distance.toFixed(2),
+          route.duration.toFixed(0),
+          route.orders,
+          dest.hub_id,
+          `"${hubs.find(h => h.id === dest.hub_id)?.name || 'N/A'}"`
+        ].join(','));
+      }
+    });
+
+    // Convert to CSV string
+    const csvContent = csvRows.join('\n');
+
+    // Create blob and download
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+    const hubName = selectedHub.name.replace(/[^a-zA-Z0-9]/g, '_');
+    const filename = `route_calculation_${hubName}_${timestamp}.csv`;
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const totalDistance = calculatedRoutes.reduce((sum, r) => sum + r.distance, 0);
   const totalDuration = calculatedRoutes.reduce((sum, r) => sum + r.duration, 0);
   const totalOrders = calculatedRoutes.reduce((sum, r) => sum + r.orders, 0);
@@ -890,6 +975,33 @@ const Dashboard = ({
                     Tổng orders: <strong>{totalOrders} orders/tháng</strong>
                   </div>
                 </div>
+
+                {/* Export CSV Button */}
+                <button
+                  onClick={handleExportCSV}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: '#28a745',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#218838'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#28a745'}
+                >
+                  📥 Xuất file CSV
+                </button>
+
                 <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
                   {calculatedRoutes.map((route, idx) => {
                     // Determine carrier type badge color

@@ -1750,8 +1750,8 @@
     "address": "Boeng Keng Kang Ti Pir, Boeng Keng Kang, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 13,
-    "lat": 11.5532290051,
-    "long": 104.9165757437,
+    "lat": 11.568271,
+    "long": 104.922443,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1763,8 +1763,8 @@
     "address": "Tuol Svay Prey Ti Pir, Boeng Keng Kang, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 7,
-    "lat": 11.5532186439,
-    "long": 104.9071125306,
+    "lat": 11.568271,
+    "long": 104.922443,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1776,8 +1776,8 @@
     "address": "Boeng Trabaek, Chamkar Mon, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 14,
-    "lat": 11.5392960345,
-    "long": 104.9193625522,
+    "lat": 11.537783,
+    "long": 104.920235,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1789,8 +1789,8 @@
     "address": "Tuol Tumpung Ti Muoy, Chamkar Mon, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 8,
-    "lat": 11.5387444547,
-    "long": 104.9170561704,
+    "lat": 11.537783,
+    "long": 104.920235,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1802,8 +1802,8 @@
     "address": "Tuol Tumpung Ti Pir, Chamkar Mon, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 46,
-    "lat": 11.5417248105,
-    "long": 104.9105886923,
+    "lat": 11.537783,
+    "long": 104.920235,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1815,8 +1815,8 @@
     "address": "Chbar Ampov Ti Pir, Chbar Ampov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 16,
-    "lat": 11.5349453745,
-    "long": 104.9392818575,
+    "lat": 11.522551,
+    "long": 104.96247,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1828,8 +1828,8 @@
     "address": "Kbal Kaoh, Chbar Ampov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 22,
-    "lat": 11.5087636767,
-    "long": 104.9996239608,
+    "lat": 11.522551,
+    "long": 104.96247,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1841,8 +1841,8 @@
     "address": "Nirouth, Chbar Ampov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 17,
-    "lat": 11.5310313602,
-    "long": 104.9609944693,
+    "lat": 11.522551,
+    "long": 104.96247,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1854,8 +1854,8 @@
     "address": "Preaek Aeng, Chbar Ampov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 6,
-    "lat": 11.5218130037,
-    "long": 104.9846515479,
+    "lat": 11.522551,
+    "long": 104.96247,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1867,8 +1867,8 @@
     "address": "Preaek Pra, Chbar Ampov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 17,
-    "lat": 11.5043312314,
-    "long": 104.947536419,
+    "lat": 11.522551,
+    "long": 104.96247,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1880,8 +1880,8 @@
     "address": "Preaek Thmei, Chbar Ampov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 5,
-    "lat": 11.4702705625,
-    "long": 104.9909287845,
+    "lat": 11.522551,
+    "long": 104.96247,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1893,8 +1893,8 @@
     "address": "Veal Sbov, Chbar Ampov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 16,
-    "lat": 11.5263323864,
-    "long": 104.9710937687,
+    "lat": 11.522551,
+    "long": 104.96247,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1906,8 +1906,8 @@
     "address": "Bak Kaeng, Chraoy Chongvar, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 8,
-    "lat": 11.7037495187,
-    "long": 104.9348191437,
+    "lat": 11.658559,
+    "long": 104.91317,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1919,8 +1919,8 @@
     "address": "Chrouy Changvar, Chraoy Chongvar, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 7,
-    "lat": 11.5798067624,
-    "long": 104.9340571162,
+    "lat": 11.658559,
+    "long": 104.91317,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1932,8 +1932,8 @@
     "address": "Preaek Lieb, Chraoy Chongvar, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 48,
-    "lat": 11.6394920494,
-    "long": 104.9193107467,
+    "lat": 11.658559,
+    "long": 104.91317,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1945,8 +1945,8 @@
     "address": "Cheung Aek, Dangkao, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 7,
-    "lat": 11.4961160872,
-    "long": 104.8994053287,
+    "lat": 11.504923,
+    "long": 104.89187,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1958,8 +1958,8 @@
     "address": "Dangkao, Dangkao, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 78,
-    "lat": 11.4955583923,
-    "long": 104.8862906643,
+    "lat": 11.504923,
+    "long": 104.89187,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1971,8 +1971,8 @@
     "address": "Krang Pongro, Dangkao, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 11,
-    "lat": 11.4430779643,
-    "long": 104.8081272576,
+    "lat": 11.504923,
+    "long": 104.89187,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1984,8 +1984,8 @@
     "address": "Pong Tuek, Dangkao, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 8,
-    "lat": 11.4740407708,
-    "long": 104.8358559337,
+    "lat": 11.504923,
+    "long": 104.89187,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -1997,8 +1997,8 @@
     "address": "Prey Sa, Dangkao, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 21,
-    "lat": 11.4919265065,
-    "long": 104.8583435514,
+    "lat": 11.504923,
+    "long": 104.89187,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2010,8 +2010,8 @@
     "address": "Roluos, Dangkao, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 13,
-    "lat": 11.4838386799,
-    "long": 104.9008136845,
+    "lat": 11.504923,
+    "long": 104.89187,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2023,8 +2023,8 @@
     "address": "Spean Thma, Dangkao, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 14,
-    "lat": 11.4693016658,
-    "long": 104.8680553774,
+    "lat": 11.469678,
+    "long": 104.89021,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2036,8 +2036,8 @@
     "address": "Chey Chummeah, Doun Penh, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 7,
-    "lat": 11.5624716069,
-    "long": 104.9317298961,
+    "lat": 11.575837,
+    "long": 104.9201,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2049,8 +2049,8 @@
     "address": "Phsar Kandal Ti Muoy, Doun Penh, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 19,
-    "lat": 11.5668407766,
-    "long": 104.9293324781,
+    "lat": 11.575837,
+    "long": 104.9201,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2062,8 +2062,8 @@
     "address": "Srah Chak, Doun Penh, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 5,
-    "lat": 11.5786123019,
-    "long": 104.9160016034,
+    "lat": 11.575837,
+    "long": 104.9201,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2075,8 +2075,8 @@
     "address": "Kamboul, Kamboul, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 8,
-    "lat": 11.5369205592,
-    "long": 104.7848499288,
+    "lat": 11.528086,
+    "long": 104.77919,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2088,8 +2088,8 @@
     "address": "Kantaok, Kamboul, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 67,
-    "lat": 11.5084166871,
-    "long": 104.7827669111,
+    "lat": 11.515066,
+    "long": 104.810196,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2101,8 +2101,8 @@
     "address": "Phleung Chheh Roteh, Kamboul, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 18,
-    "lat": 11.4915557293,
-    "long": 104.810152375,
+    "lat": 11.528086,
+    "long": 104.77919,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2114,8 +2114,8 @@
     "address": "Snaor, Kamboul, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 12,
-    "lat": 11.5790403765,
-    "long": 104.7694945079,
+    "lat": 11.528086,
+    "long": 104.77919,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2127,8 +2127,8 @@
     "address": "Boeng Tumpun 1, Mean Chey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 34,
-    "lat": 11.5301041631,
-    "long": 104.9120736408,
+    "lat": 11.530254,
+    "long": 104.8976,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2140,8 +2140,8 @@
     "address": "Boeng Tumpun 2, Mean Chey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 11,
-    "lat": 11.5267441211,
-    "long": 104.8994977692,
+    "lat": 11.530254,
+    "long": 104.8976,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2153,8 +2153,8 @@
     "address": "Chak Angrae Leu, Mean Chey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 7,
-    "lat": 11.5214703267,
-    "long": 104.9331961487,
+    "lat": 11.530254,
+    "long": 104.8976,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2166,8 +2166,8 @@
     "address": "Stueng Mean chey 1, Mean Chey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 38,
-    "lat": 11.5315045228,
-    "long": 104.8829066465,
+    "lat": 11.530254,
+    "long": 104.8976,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2179,8 +2179,8 @@
     "address": "Stueng Mean chey 2, Mean Chey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 42,
-    "lat": 11.5308022855,
-    "long": 104.8869069225,
+    "lat": 11.530254,
+    "long": 104.8976,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2192,8 +2192,8 @@
     "address": "Stueng Mean chey 3, Mean Chey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 61,
-    "lat": 11.5218191709,
-    "long": 104.8817587274,
+    "lat": 11.530254,
+    "long": 104.8976,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2205,8 +2205,8 @@
     "address": "Kouk Roka, Praek Pnov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 50,
-    "lat": 11.6193749104,
-    "long": 104.8140770399,
+    "lat": 11.587771,
+    "long": 104.8125,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2218,8 +2218,8 @@
     "address": "Ponhea Pon, Praek Pnov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 22,
-    "lat": 11.6620156673,
-    "long": 104.7955569526,
+    "lat": 11.587771,
+    "long": 104.8125,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2231,8 +2231,8 @@
     "address": "Preaek Phnov, Praek Pnov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 44,
-    "lat": 11.659477416,
-    "long": 104.8588568568,
+    "lat": 11.587771,
+    "long": 104.8125,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2244,8 +2244,8 @@
     "address": "Samraong, Praek Pnov, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 5,
-    "lat": 11.6855630521,
-    "long": 104.8321196197,
+    "lat": 11.587771,
+    "long": 104.8125,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2257,8 +2257,8 @@
     "address": "Mittapheap, Prampir Meakkakra, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 5,
-    "lat": 11.5681433482,
-    "long": 104.9118377191,
+    "lat": 11.562201,
+    "long": 104.91854,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2270,8 +2270,8 @@
     "address": "Ou Ruessei Ti Muoy, Prampir Meakkakra, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 12,
-    "lat": 11.564014323,
-    "long": 104.9166081717,
+    "lat": 11.562201,
+    "long": 104.91854,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2283,8 +2283,8 @@
     "address": "Ou Ruessei Ti Pir, Prampir Meakkakra, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 8,
-    "lat": 11.5638723572,
-    "long": 104.9145089326,
+    "lat": 11.562201,
+    "long": 104.91854,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2296,8 +2296,8 @@
     "address": "Veal Vong, Prampir Meakkakra, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 6,
-    "lat": 11.5603248033,
-    "long": 104.9115711318,
+    "lat": 11.562201,
+    "long": 104.91854,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2309,8 +2309,8 @@
     "address": "Chaom Chau 1, Pur SenChey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 105,
-    "lat": 11.5246958644,
-    "long": 104.8526619686,
+    "lat": 11.554667,
+    "long": 104.82684,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2322,8 +2322,8 @@
     "address": "Chaom Chau 2, Pur SenChey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 92,
-    "lat": 11.5401604134,
-    "long": 104.8248249834,
+    "lat": 11.554667,
+    "long": 104.82684,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2335,8 +2335,8 @@
     "address": "Chaom Chau 3, Pur SenChey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 41,
-    "lat": 11.5381118729,
-    "long": 104.8322980397,
+    "lat": 11.554667,
+    "long": 104.82684,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2348,8 +2348,8 @@
     "address": "Kakab 1, Pur SenChey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 32,
-    "lat": 11.558086085,
-    "long": 104.8605798981,
+    "lat": 11.554667,
+    "long": 104.82684,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2361,8 +2361,8 @@
     "address": "Kakab 2, Pur SenChey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 11,
-    "lat": 11.5394687631,
-    "long": 104.8332213134,
+    "lat": 11.554667,
+    "long": 104.82684,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2374,8 +2374,8 @@
     "address": "Samraong Kraom, Pur SenChey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 31,
-    "lat": 11.5728277594,
-    "long": 104.8094622182,
+    "lat": 11.554667,
+    "long": 104.82684,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2387,8 +2387,8 @@
     "address": "Trapeang Krasang, Pur SenChey, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 8,
-    "lat": 11.5559319702,
-    "long": 104.7985420285,
+    "lat": 11.554667,
+    "long": 104.82684,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2400,8 +2400,8 @@
     "address": "Chrang Chamreh Ti Pir, Russey Keo, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 25,
-    "lat": 11.6238298574,
-    "long": 104.8920681481,
+    "lat": 11.630107,
+    "long": 104.9043,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2413,8 +2413,8 @@
     "address": "Kilomaetr Lekh Prammuoy, Russey Keo, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 16,
-    "lat": 11.6169272155,
-    "long": 104.9152340662,
+    "lat": 11.630107,
+    "long": 104.9043,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2426,8 +2426,8 @@
     "address": "Ruessei Kaev, Russey Keo, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 19,
-    "lat": 11.6006839053,
-    "long": 104.9044368315,
+    "lat": 11.630107,
+    "long": 104.9043,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2439,8 +2439,8 @@
     "address": "Tuol Sangkae 1, Russey Keo, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 66,
-    "lat": 11.6005935532,
-    "long": 104.9139049146,
+    "lat": 11.630107,
+    "long": 104.9043,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2452,8 +2452,8 @@
     "address": "Tuol Sangkae 2, Russey Keo, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 15,
-    "lat": 11.5872592712,
-    "long": 104.9053427434,
+    "lat": 11.630107,
+    "long": 104.9043,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2465,8 +2465,8 @@
     "address": "Khmuonh, Saensokh, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 27,
-    "lat": 11.6250623445,
-    "long": 104.8592022865,
+    "lat": 11.578108,
+    "long": 104.87022,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2478,8 +2478,8 @@
     "address": "Kouk Khleang, Saensokh, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 27,
-    "lat": 11.5787649678,
-    "long": 104.8535746409,
+    "lat": 11.578108,
+    "long": 104.87022,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2491,8 +2491,8 @@
     "address": "Krang Thnong, Saensokh, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 101,
-    "lat": 11.5839779901,
-    "long": 104.8357712441,
+    "lat": 11.578108,
+    "long": 104.87022,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2504,8 +2504,8 @@
     "address": "Ou Baek K'am, Saensokh, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 23,
-    "lat": 11.5509413063,
-    "long": 104.8878265825,
+    "lat": 11.578108,
+    "long": 104.87022,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2517,8 +2517,8 @@
     "address": "Phnom Penh Thmei, Saensokh, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 88,
-    "lat": 11.5896048879,
-    "long": 104.8634217125,
+    "lat": 11.578108,
+    "long": 104.87022,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2530,8 +2530,8 @@
     "address": "Tuek Thla, Saensokh, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 13,
-    "lat": 11.5623844454,
-    "long": 104.8806897047,
+    "lat": 11.578108,
+    "long": 104.87022,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2543,8 +2543,8 @@
     "address": "Boeng Kak Ti Muoy, Tuol Kouk, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 7,
-    "lat": 11.5827400121,
-    "long": 104.903637778,
+    "lat": 11.572623,
+    "long": 104.89913,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2556,8 +2556,8 @@
     "address": "Boeng Kak Ti Pir, Tuol Kouk, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 22,
-    "lat": 11.5726647309,
-    "long": 104.8909104214,
+    "lat": 11.572623,
+    "long": 104.89913,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2569,8 +2569,8 @@
     "address": "Boeng Salang, Tuol Kouk, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 5,
-    "lat": 11.5524074739,
-    "long": 104.8950743528,
+    "lat": 11.572623,
+    "long": 104.89913,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2582,8 +2582,8 @@
     "address": "Phsar Daeum Kor, Tuol Kouk, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 5,
-    "lat": 11.5573662876,
-    "long": 104.9045620649,
+    "lat": 11.572623,
+    "long": 104.89913,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2595,8 +2595,8 @@
     "address": "Tuek L'ak Ti Bei, Tuol Kouk, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 51,
-    "lat": 11.560106372,
-    "long": 104.8935610231,
+    "lat": 11.572623,
+    "long": 104.89913,
     "hub_id": "hub_phnom_penh"
   },
   {
@@ -2608,8 +2608,8 @@
     "address": "Tuek L'ak Ti Pir, Tuol Kouk, Phnom Penh",
     "carrier_type": "2PL",
     "oders_per_month": 14,
-    "lat": 11.5635370001,
-    "long": 104.8957885564,
+    "lat": 11.572623,
+    "long": 104.89913,
     "hub_id": "hub_phnom_penh"
   },
   {
