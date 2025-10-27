@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Map from './components/Map'
 import Dashboard from './components/Dashboard'
+import PasswordProtection from './components/PasswordProtection'
 import './App.css'
 import mapboxgl from 'mapbox-gl'
 
@@ -243,9 +244,10 @@ function App() {
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-      {/* Dashboard Sidebar */}
-      <Dashboard
+    <PasswordProtection>
+      <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
+        {/* Dashboard Sidebar */}
+        <Dashboard
         hubs={hubs}
         destinations={destinations}
         selectedHub={selectedHub}
@@ -323,7 +325,8 @@ function App() {
           />
         </div>
       </div>
-    </div>
+      </div>
+    </PasswordProtection>
   )
 }
 
