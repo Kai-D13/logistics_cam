@@ -168,7 +168,7 @@ const Map = ({
           'circle-radius': [
             'interpolate',
             ['linear'],
-            ['get', 'oders_per_month'],
+            ['get', 'orders_per_month'],
             0, 8,      // 0 orders = 8px radius (increased from 5px)
             10, 12,    // 10 orders = 12px (increased from 8px)
             20, 16,    // 20 orders = 16px (increased from 11px)
@@ -264,7 +264,7 @@ const Map = ({
                 </span>
               </div>
               <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
-                📦 ${props.oders_per_month || 0} orders/tháng
+                📦 ${props.orders_per_month || 0} orders/tháng
               </div>
               ${distanceHTML}
             </div>
@@ -310,7 +310,7 @@ const Map = ({
 
       // Calculate hub statistics
       const hubDestinations = destinations.filter(d => d.hub_id === hub.id);
-      const totalOrders = hubDestinations.reduce((sum, d) => sum + (d.oders_per_month || 0), 0);
+      const totalOrders = hubDestinations.reduce((sum, d) => sum + (d.orders_per_month || 0), 0);
       const twoPlCount = hubDestinations.filter(d => d.carrier_type === '2PL').length;
       const threePlCount = hubDestinations.filter(d => d.carrier_type === '3PL').length;
       const isEmpty = hubDestinations.length === 0;
@@ -318,10 +318,10 @@ const Map = ({
       // Calculate orders by carrier type
       const twoPlOrders = hubDestinations
         .filter(d => d.carrier_type === '2PL')
-        .reduce((sum, d) => sum + (d.oders_per_month || 0), 0);
+        .reduce((sum, d) => sum + (d.orders_per_month || 0), 0);
       const threePlOrders = hubDestinations
         .filter(d => d.carrier_type === '3PL')
-        .reduce((sum, d) => sum + (d.oders_per_month || 0), 0);
+        .reduce((sum, d) => sum + (d.orders_per_month || 0), 0);
 
       // Calculate marker size based on total orders
       // Base size: 18px, scale up to 36px for high-volume hubs
@@ -523,7 +523,7 @@ const Map = ({
           name: dest.name,
           address: dest.address,
           carrier_type: dest.carrier_type,
-          oders_per_month: dest.oders_per_month || 0,
+          orders_per_month: dest.orders_per_month || 0,
           selected: selectedDestinations.includes(dest.id),
           distance_from_hub: distanceFromHub,
           hub_name: selectedHub ? selectedHub.name : 'N/A',
@@ -749,7 +749,7 @@ const Map = ({
                     🏠 ${dest.address || 'N/A'}
                   </div>
                   <div style="font-size: 11px; color: #666; margin-bottom: 3px;">
-                    🏢 ${dest.carrier_type} • 📦 ${dest.oders_per_month || 0} orders/tháng
+                    🏢 ${dest.carrier_type} • 📦 ${dest.orders_per_month || 0} orders/tháng
                   </div>
                   <div style="
                     font-size: 12px;
@@ -828,7 +828,7 @@ const Map = ({
           };
         }
         districtStats[districtName].count++;
-        districtStats[districtName].orders += dest.oders_per_month || 0;
+        districtStats[districtName].orders += dest.orders_per_month || 0;
         districtStats[districtName].destinations.push(dest.name);
       }
     });
